@@ -176,6 +176,74 @@
             color: #667eea;
         }
 
+        .person-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+            padding: 15px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 15px;
+        }
+
+        .person-tab {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 25px;
+            background: white;
+            color: #333;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .person-tab:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        .person-tab.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .person-tab-avatar {
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+        }
+
+        .person-tab.active .person-tab-avatar {
+            background: white;
+            color: #667eea;
+        }
+
+        .person-tab-count {
+            background: #e0e7ff;
+            color: #4338ca;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 11px;
+            font-weight: 600;
+        }
+
+        .person-tab.active .person-tab-count {
+            background: rgba(255,255,255,0.3);
+            color: white;
+        }
+
         .people-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
@@ -629,6 +697,8 @@
             <button class="view-tab" onclick="switchView('people')">👥 Theo người</button>
         </div>
 
+        <div id="personTabs" class="person-tabs" style="display:none;"></div>
+
         <div id="allTasksView">
             <div class="filters">
                 <button class="filter-btn active" data-filter="all">Tất cả</button>
@@ -702,6 +772,7 @@
         let currentFilter = 'all';
         let editingId = null;
         let currentView = 'all';
+        let currentPerson = null;
 
         // Dữ liệu mẫu ban đầu
         const defaultData = [
@@ -776,64 +847,141 @@
             event.target.classList.add('active');
             
             if (view === 'all') {
+                document.getElementById('personTabs').style.display = 'none';
                 document.getElementById('allTasksView').style.display = 'block';
                 document.getElementById('peopleView').style.display = 'none';
+                currentPerson = null;
                 renderTasks(currentFilter);
             } else {
+                document.getElementById('personTabs').style.display = 'flex';
                 document.getElementById('allTasksView').style.display = 'none';
                 document.getElementById('peopleView').style.display = 'block';
-                renderPeopleView();
+                renderPersonTabs();
             }
         }
 
-        // Render view theo người
-        function renderPeopleView() {
+        // Render tabs cho từng người
+        function renderPersonTabs() {
             const peopleMap = {};
             
-            // Nhóm tasks theo người
+            // Đếm số công việc của mỗi người
             tasksData.forEach(task => {
                 if (!peopleMap[task.assignee]) {
-                    peopleMap[task.assignee] = [];
+                    peopleMap[task.assignee] = 0;
                 }
-                peopleMap[task.assignee].push(task);
+                peopleMap[task.assignee]++;
             });
             
-            const container = document.getElementById('peopleGrid');
-            container.innerHTML = Object.keys(peopleMap).map(person => {
-                const tasks = peopleMap[person];
+            const people = Object.keys(peopleMap);
+            const tabsContainer = document.getElementById('personTabs');
+            
+            tabsContainer.innerHTML = people.map((person, index) => {
                 const initial = person.charAt(0).toUpperCase();
+                const count = peopleMap[person];
+                const isActive = (currentPerson === person) || (currentPerson === null && index === 0);
                 
                 return `
-                    <div class="person-card">
-                        <div class="person-header">
-                            <div class="person-avatar">${initial}</div>
-                            <div class="person-name">${person}</div>
-                            <div class="person-task-count">${tasks.length} việc</div>
-                        </div>
-                        <div class="person-tasks">
-                            ${tasks.map(task => `
-                                <div class="mini-task ${task.status}" onclick="editTask(${task.id})">
-                                    <div style="font-weight:600;margin-bottom:5px;">${task.title}</div>
-                                    <div style="font-size:12px;color:#666;margin-bottom:8px;">📅 ${formatDate(task.deadline)} • ${getStatusText(task.status)}</div>
+                    <button class="person-tab ${isActive ? 'active' : ''}" onclick="switchPerson('${person.replace(/'/g, "\\'")}')">
+                        <div class="person-tab-avatar">${initial}</div>
+                        <span>${person}</span>
+                        <span class="person-tab-count">${count}</span>
+                    </button>
+                `;
+            }).join('');
+            
+            // Nếu chưa chọn người nào, chọn người đầu tiên
+            if (currentPerson === null && people.length > 0) {
+                currentPerson = people[0];
+            }
+            
+            renderPersonTasks();
+        }
+
+        // Chuyển sang xem công việc của người khác
+        function switchPerson(person) {
+            currentPerson = person;
+            document.querySelectorAll('.person-tab').forEach(tab => tab.classList.remove('active'));
+            event.target.closest('.person-tab').classList.add('active');
+            renderPersonTasks();
+        }
+
+        // Hiển thị công việc của người được chọn
+        function renderPersonTasks() {
+            const personTasks = tasksData.filter(task => task.assignee === currentPerson);
+            const container = document.getElementById('peopleGrid');
+            
+            if (personTasks.length === 0) {
+                container.innerHTML = '<div style="text-align:center;padding:40px;color:white;font-size:18px;grid-column:1/-1;">Chưa có công việc nào</div>';
+                return;
+            }
+            
+            container.innerHTML = `
+                <div style="grid-column: 1 / -1;">
+                    <div style="background:white;padding:25px;border-radius:15px;box-shadow:0 10px 30px rgba(0,0,0,0.2);">
+                        <h2 style="color:#333;margin-bottom:20px;display:flex;align-items:center;gap:10px;">
+                            <span style="width:50px;height:50px;border-radius:50%;background:linear-gradient(135deg,#667eea,#764ba2);color:white;display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:bold;">
+                                ${currentPerson.charAt(0).toUpperCase()}
+                            </span>
+                            <span>${currentPerson}</span>
+                            <span style="background:#e0e7ff;color:#4338ca;padding:8px 16px;border-radius:20px;font-size:16px;margin-left:auto;">
+                                ${personTasks.length} công việc
+                            </span>
+                        </h2>
+                        
+                        <div style="display:grid;gap:15px;">
+                            ${personTasks.map(task => `
+                                <div class="task-card ${task.status}">
+                                    <div class="task-actions">
+                                        <button class="task-action-btn edit" onclick="editTask(${task.id})">✏️ Sửa</button>
+                                        <button class="task-action-btn delete" onclick="deleteTask(${task.id})">🗑️ Xóa</button>
+                                    </div>
+                                    <div class="task-header">
+                                        <div class="task-title">${task.title}</div>
+                                        <span class="task-status ${task.status}" onclick="changeStatus(${task.id})" style="cursor:pointer;" title="Click để đổi trạng thái">
+                                            ${getStatusText(task.status)}
+                                        </span>
+                                    </div>
+                                    <div class="task-info">${task.description || ''}</div>
+                                    <div class="task-meta">
+                                        <span>📅 ${formatDate(task.deadline)}</span>
+                                        <span>📊 ${task.progress}%</span>
+                                    </div>
                                     ${task.submissionLink || task.submissionNote ? `
                                     <div class="submission-section">
-                                        <div class="submission-label">📎 Đã nộp:</div>
+                                        <div class="submission-label">📎 Đã nộp bài:</div>
                                         <div class="submission-content">
-                                            ${task.submissionLink ? `<a href="${task.submissionLink}" target="_blank" class="submission-link">🔗 Link</a>` : ''}
+                                            ${task.submissionLink ? `<a href="${task.submissionLink}" target="_blank" class="submission-link" onclick="event.stopPropagation()">🔗 ${task.submissionLink}</a>` : ''}
                                             ${task.submissionNote ? `<span class="submission-file">📄 ${task.submissionNote}</span>` : ''}
                                         </div>
                                     </div>
                                     ` : `
-                                    <div class="submission-content">
-                                        <button class="submit-btn" onclick="event.stopPropagation();submitWork(${task.id})">📤 Nộp bài</button>
+                                    <div style="margin-top:10px;">
+                                        <button class="submit-btn" onclick="submitWork(${task.id})">📤 Nộp bài</button>
                                     </div>
                                     `}
+                                    ${task.status !== 'completed' && task.status !== 'pending' && task.status !== 'overdue' ? `
+                                    <div class="progress-bar">
+                                        <div class="progress-fill" style="width: ${task.progress}%"></div>
+                                    </div>
+                                    ` : ''}
+                                    <div class="status-quick-change" style="margin-top:15px;display:flex;gap:8px;flex-wrap:wrap;">
+                                        ${task.status === 'pending' ? '<button class="status-btn" onclick="quickChangeStatus(' + task.id + ', \'inprogress\', 50)" style="background:#fef3c7;color:#92400e;padding:6px 12px;border:none;border-radius:6px;cursor:pointer;font-size:12px;">▶️ Bắt đầu</button>' : ''}
+                                        ${task.status === 'inprogress' ? '<button class="status-btn" onclick="quickChangeStatus(' + task.id + ', \'completed\', 100)" style="background:#d1fae5;color:#065f46;padding:6px 12px;border:none;border-radius:6px;cursor:pointer;font-size:12px;">✅ Hoàn thành</button>' : ''}
+                                        ${task.status === 'overdue' ? '<button class="status-btn" onclick="quickChangeStatus(' + task.id + ', \'inprogress\', 50)" style="background:#fef3c7;color:#92400e;padding:6px 12px;border:none;border-radius:6px;cursor:pointer;font-size:12px;">▶️ Tiếp tục</button>' : ''}
+                                        ${task.status === 'overdue' ? '<button class="status-btn" onclick="quickChangeStatus(' + task.id + ', \'completed\', 100)" style="background:#d1fae5;color:#065f46;padding:6px 12px;border:none;border-radius:6px;cursor:pointer;font-size:12px;">✅ Hoàn thành</button>' : ''}
+                                        ${task.status === 'completed' ? '<button class="status-btn" onclick="quickChangeStatus(' + task.id + ', \'inprogress\', 50)" style="background:#fef3c7;color:#92400e;padding:6px 12px;border:none;border-radius:6px;cursor:pointer;font-size:12px;">↩️ Làm lại</button>' : ''}
+                                    </div>
                                 </div>
                             `).join('')}
                         </div>
                     </div>
-                `;
-            }).join('');
+                </div>
+            `;
+        }
+
+        // Render view theo người
+        function renderPeopleView() {
+            renderPersonTabs();
         }
 
         // Nộp bài
@@ -937,7 +1085,11 @@
             
             saveToStorage();
             updateStats();
-            renderTasks(currentFilter);
+            if (currentView === 'all') {
+                renderTasks(currentFilter);
+            } else {
+                renderPersonTasks();
+            }
         }
 
         // Chuyển đổi trạng thái theo vòng lặp (click vào badge)
@@ -962,7 +1114,11 @@
             
             saveToStorage();
             updateStats();
-            renderTasks(currentFilter);
+            if (currentView === 'all') {
+                renderTasks(currentFilter);
+            } else {
+                renderPersonTasks();
+            }
         }
 
         // Mở modal thêm
@@ -1000,7 +1156,11 @@
                 tasksData = tasksData.filter(t => t.id !== id);
                 saveToStorage();
                 updateStats();
-                renderTasks(currentFilter);
+                if (currentView === 'all') {
+                    renderTasks(currentFilter);
+                } else {
+                    renderPersonTasks();
+                }
             }
         }
 
@@ -1035,7 +1195,7 @@
             if (currentView === 'all') {
                 renderTasks(currentFilter);
             } else {
-                renderPeopleView();
+                renderPersonTabs();
             }
         }
 
