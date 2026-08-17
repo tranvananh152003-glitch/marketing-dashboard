@@ -480,6 +480,42 @@
             background: #fef2f2;
         }
 
+        .task-status-badge {
+            display: inline-block;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 15px;
+            font-weight: 600;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+
+        .task-status-badge:hover {
+            transform: scale(1.05);
+        }
+
+        .task-status-badge.completed {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .task-status-badge.inprogress {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .task-status-badge.pending {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .task-status-badge.overdue {
+            background: #fee2e2;
+            color: #991b1b;
+            animation: pulse 2s infinite;
+        }
+
         .task-actions {
             display: flex;
             gap: 8px;
@@ -507,19 +543,13 @@
         }
 
         .task-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
             margin-bottom: 10px;
-            flex-wrap: wrap;
-            gap: 10px;
         }
 
         .task-title {
             font-size: 18px;
             font-weight: 600;
             color: #333;
-            flex: 1;
         }
 
         .task-status {
@@ -1068,11 +1098,11 @@
                                         <button class="task-action-btn edit" onclick="editTask(${task.id})">✏️ Sửa</button>
                                         <button class="task-action-btn delete" onclick="deleteTask(${task.id})">🗑️ Xóa</button>
                                     </div>
+                                    <span class="task-status-badge ${task.status}" onclick="changeStatus(${task.id})" title="Click để đổi trạng thái">
+                                        ${getStatusText(task.status)}
+                                    </span>
                                     <div class="task-header">
                                         <div class="task-title">${task.title}</div>
-                                        <span class="task-status ${task.status}" onclick="changeStatus(${task.id})" style="cursor:pointer;" title="Click để đổi trạng thái">
-                                            ${getStatusText(task.status)}
-                                        </span>
                                     </div>
                                     <div class="task-info">${task.description || ''}</div>
                                     <div class="task-meta">
@@ -1100,13 +1130,6 @@
                                         <div class="progress-fill" style="width: ${task.progress}%"></div>
                                     </div>
                                     ` : ''}
-                                    <div class="status-quick-change" style="margin-top:15px;display:flex;gap:8px;flex-wrap:wrap;">
-                                        ${task.status === 'pending' ? '<button class="status-btn" onclick="quickChangeStatus(' + task.id + ', \'inprogress\', 50)" style="background:#fef3c7;color:#92400e;padding:6px 12px;border:none;border-radius:6px;cursor:pointer;font-size:12px;">▶️ Bắt đầu</button>' : ''}
-                                        ${task.status === 'inprogress' ? '<button class="status-btn" onclick="quickChangeStatus(' + task.id + ', \'completed\', 100)" style="background:#d1fae5;color:#065f46;padding:6px 12px;border:none;border-radius:6px;cursor:pointer;font-size:12px;">✅ Hoàn thành</button>' : ''}
-                                        ${task.status === 'overdue' ? '<button class="status-btn" onclick="quickChangeStatus(' + task.id + ', \'inprogress\', 50)" style="background:#fef3c7;color:#92400e;padding:6px 12px;border:none;border-radius:6px;cursor:pointer;font-size:12px;">▶️ Tiếp tục</button>' : ''}
-                                        ${task.status === 'overdue' ? '<button class="status-btn" onclick="quickChangeStatus(' + task.id + ', \'completed\', 100)" style="background:#d1fae5;color:#065f46;padding:6px 12px;border:none;border-radius:6px;cursor:pointer;font-size:12px;">✅ Hoàn thành</button>' : ''}
-                                        ${task.status === 'completed' ? '<button class="status-btn" onclick="quickChangeStatus(' + task.id + ', \'inprogress\', 50)" style="background:#fef3c7;color:#92400e;padding:6px 12px;border:none;border-radius:6px;cursor:pointer;font-size:12px;">↩️ Làm lại</button>' : ''}
-                                    </div>
                                 </div>
                             `).join('')}
                         </div>
@@ -1174,11 +1197,11 @@
                         <button class="task-action-btn edit" onclick="editTask(${task.id})">✏️ Sửa</button>
                         <button class="task-action-btn delete" onclick="deleteTask(${task.id})">🗑️ Xóa</button>
                     </div>
+                    <span class="task-status-badge ${task.status}" onclick="changeStatus(${task.id})" title="Click để đổi trạng thái">
+                        ${getStatusText(task.status)}
+                    </span>
                     <div class="task-header">
                         <div class="task-title">${task.title}</div>
-                        <span class="task-status ${task.status}" onclick="changeStatus(${task.id})" style="cursor:pointer;" title="Click để đổi trạng thái">
-                            ${getStatusText(task.status)}
-                        </span>
                     </div>
                     <div class="task-info">${task.description || ''}</div>
                     <div class="task-meta">
@@ -1203,13 +1226,6 @@
                         <div class="progress-fill" style="width: ${task.progress}%"></div>
                     </div>
                     ` : ''}
-                    <div class="status-quick-change" style="margin-top:15px;display:flex;gap:8px;flex-wrap:wrap;">
-                        ${task.status === 'pending' ? '<button class="status-btn" onclick="quickChangeStatus(' + task.id + ', \'inprogress\', 50)" style="background:#fef3c7;color:#92400e;padding:6px 12px;border:none;border-radius:6px;cursor:pointer;font-size:12px;">▶️ Bắt đầu</button>' : ''}
-                        ${task.status === 'inprogress' ? '<button class="status-btn" onclick="quickChangeStatus(' + task.id + ', \'completed\', 100)" style="background:#d1fae5;color:#065f46;padding:6px 12px;border:none;border-radius:6px;cursor:pointer;font-size:12px;">✅ Hoàn thành</button>' : ''}
-                        ${task.status === 'overdue' ? '<button class="status-btn" onclick="quickChangeStatus(' + task.id + ', \'inprogress\', 50)" style="background:#fef3c7;color:#92400e;padding:6px 12px;border:none;border-radius:6px;cursor:pointer;font-size:12px;">▶️ Tiếp tục</button>' : ''}
-                        ${task.status === 'overdue' ? '<button class="status-btn" onclick="quickChangeStatus(' + task.id + ', \'completed\', 100)" style="background:#d1fae5;color:#065f46;padding:6px 12px;border:none;border-radius:6px;cursor:pointer;font-size:12px;">✅ Hoàn thành</button>' : ''}
-                        ${task.status === 'completed' ? '<button class="status-btn" onclick="quickChangeStatus(' + task.id + ', \'inprogress\', 50)" style="background:#fef3c7;color:#92400e;padding:6px 12px;border:none;border-radius:6px;cursor:pointer;font-size:12px;">↩️ Làm lại</button>' : ''}
-                    </div>
                 </div>
             `).join('');
         }
