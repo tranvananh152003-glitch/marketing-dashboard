@@ -106,11 +106,20 @@
         .bulk-btn:hover { transform: translateY(-2px); }
         .bulk-btn.complete { background: #10b981; color: white; }
         .bulk-btn.delete { background: #ef4444; color: white; }
+        .bulk-btn.select-all { background: #3b82f6; color: white; }
         .bulk-btn.cancel { background: #6b7280; color: white; }
         
         .task-checkbox {
             width: 20px; height: 20px; cursor: pointer;
             margin-right: 10px; transform: scale(1.2);
+        }
+        
+        .selection-area {
+            display: none;
+            align-items: center;
+        }
+        .selection-area.show {
+            display: flex;
         }
         
         .task-actions {
@@ -204,6 +213,7 @@
             <h1>📊 Bảng Theo Dõi Marketing 2026</h1>
             <div class="header-actions">
                 <button class="btn btn-success" onclick="openAddModal()">➕ Thêm công việc</button>
+                <button class="btn btn-primary" id="selectModeBtn" onclick="toggleSelectionMode()">☑️ Chọn nhiều</button>
                 <button class="btn btn-primary" onclick="exportData()">💾 Xuất dữ liệu</button>
                 <button class="btn btn-danger" onclick="importJSON()">📥 Nhập JSON</button>
                 <button class="btn btn-primary" onclick="importExcel()">📊 Nhập Excel</button>
@@ -258,9 +268,10 @@
     <!-- Bulk Actions Bar -->
     <div class="bulk-actions-bar" id="bulkActionsBar">
         <span class="bulk-count">Đã chọn: <strong id="selectedCount">0</strong></span>
-        <button class="bulk-btn complete" onclick="bulkComplete()">✅ Đánh dấu hoàn thành</button>
+        <button class="bulk-btn select-all" onclick="selectAll()">☑️ Chọn tất cả</button>
+        <button class="bulk-btn complete" onclick="bulkComplete()">✅ Hoàn thành</button>
         <button class="bulk-btn delete" onclick="bulkDelete()">🗑️ Xóa</button>
-        <button class="bulk-btn cancel" onclick="clearSelection()">✕ Hủy</button>
+        <button class="bulk-btn cancel" onclick="exitSelectionMode()">✕ Thoát</button>
     </div>
 
     <!-- Modal -->
@@ -355,6 +366,7 @@
         let currentPerson = null;
         let editingId = null;
         let selectedTasks = new Set();
+        let selectionMode = false;
 
         // Dữ liệu mẫu
         const defaultData = [
@@ -472,6 +484,52 @@
             document.getElementById('lastUpdate').textContent = new Date().toLocaleString('vi-VN');
         }
 
+        // Toggle selection mode
+        function toggleSelectionMode() {
+            selectionMode = !selectionMode;
+            const btn = document.getElementById('selectModeBtn');
+            
+            if (selectionMode) {
+                btn.textContent = '✕ Hủy chọn';
+                btn.style.background = '#6b7280';
+                updateBulkActionsBar();
+            } else {
+                btn.textContent = '☑️ Chọn nhiều';
+                btn.style.background = '#667eea';
+                selectedTasks.clear();
+                document.getElementById('bulkActionsBar').classList.remove('show');
+            }
+            
+            switchView(currentView);
+        }
+
+        // Exit selection mode
+        function exitSelectionMode() {
+            selectionMode = false;
+            selectedTasks.clear();
+            const btn = document.getElementById('selectModeBtn');
+            btn.textContent = '☑️ Chọn nhiều';
+            btn.style.background = '#667eea';
+            document.getElementById('bulkActionsBar').classList.remove('show');
+            switchView(currentView);
+        }
+
+        // Select all visible tasks
+        function selectAll() {
+            const container = document.getElementById('tasksContainer');
+            const checkboxes = container.querySelectorAll('.task-checkbox');
+            
+            checkboxes.forEach(checkbox => {
+                const id = parseInt(checkbox.id.replace('check-', ''));
+                if (!selectedTasks.has(id)) {
+                    selectedTasks.add(id);
+                    checkbox.checked = true;
+                }
+            });
+            
+            updateBulkActionsBar();
+        }
+
         // Toggle task selection
         function toggleTask(id) {
             if (selectedTasks.has(id)) {
@@ -484,15 +542,13 @@
 
         // Update bulk actions bar
         function updateBulkActionsBar() {
+            if (!selectionMode) return;
+            
             const bar = document.getElementById('bulkActionsBar');
             const count = document.getElementById('selectedCount');
             
-            if (selectedTasks.size > 0) {
-                bar.classList.add('show');
-                count.textContent = selectedTasks.size;
-            } else {
-                bar.classList.remove('show');
-            }
+            bar.classList.add('show');
+            count.textContent = selectedTasks.size;
         }
 
         // Bulk complete
@@ -509,9 +565,8 @@
                 });
                 
                 saveToStorage();
-                clearSelection();
+                exitSelectionMode();
                 updateStats();
-                switchView(currentView);
             }
         }
 
@@ -522,17 +577,9 @@
             if (confirm(`Xóa ${selectedTasks.size} công việc? Không thể hoàn tác!`)) {
                 tasksData = tasksData.filter(t => !selectedTasks.has(t.id));
                 saveToStorage();
-                clearSelection();
+                exitSelectionMode();
                 updateStats();
-                switchView(currentView);
             }
-        }
-
-        // Clear selection
-        function clearSelection() {
-            selectedTasks.clear();
-            updateBulkActionsBar();
-            switchView(currentView);
         }
 
         // Chuyển view
@@ -618,7 +665,7 @@
             container.innerHTML = tasks.map(task => `
                 <div class="task-card ${task.status}">
                     <div class="task-actions">
-                        <div style="display:flex;align-items:center;">
+                        <div class="selection-area ${selectionMode ? 'show' : ''}">
                             <input type="checkbox" class="task-checkbox" 
                                    id="check-${task.id}" 
                                    onchange="toggleTask(${task.id})"
