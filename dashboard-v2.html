@@ -90,8 +90,35 @@
         .task-card.pending { border-left-color: #6b7280; }
         .task-card.overdue { border-left-color: #ef4444; background: #fef2f2; }
         
+        .bulk-actions-bar {
+            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
+            background: white; padding: 15px 30px; border-radius: 50px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+            display: none; align-items: center; gap: 15px; z-index: 999;
+        }
+        .bulk-actions-bar.show { display: flex; }
+        .bulk-count { font-weight: 600; color: #333; }
+        .bulk-btn {
+            padding: 8px 16px; border: none; border-radius: 8px;
+            cursor: pointer; font-size: 13px; font-weight: 500;
+            transition: all 0.2s;
+        }
+        .bulk-btn:hover { transform: translateY(-2px); }
+        .bulk-btn.complete { background: #10b981; color: white; }
+        .bulk-btn.delete { background: #ef4444; color: white; }
+        .bulk-btn.cancel { background: #6b7280; color: white; }
+        
+        .task-checkbox {
+            width: 20px; height: 20px; cursor: pointer;
+            margin-right: 10px; transform: scale(1.2);
+        }
+        
         .task-actions {
-            display: flex; gap: 8px; margin-bottom: 10px; justify-content: flex-end;
+            display: flex; gap: 8px; margin-bottom: 10px; justify-content: space-between;
+            align-items: center;
+        }
+        .task-action-btns {
+            display: flex; gap: 8px;
         }
         .task-action-btn {
             padding: 5px 10px; border: none; border-radius: 5px;
@@ -228,6 +255,14 @@
         <div class="tasks-container" id="tasksContainer"></div>
     </div>
 
+    <!-- Bulk Actions Bar -->
+    <div class="bulk-actions-bar" id="bulkActionsBar">
+        <span class="bulk-count">Đã chọn: <strong id="selectedCount">0</strong></span>
+        <button class="bulk-btn complete" onclick="bulkComplete()">✅ Đánh dấu hoàn thành</button>
+        <button class="bulk-btn delete" onclick="bulkDelete()">🗑️ Xóa</button>
+        <button class="bulk-btn cancel" onclick="clearSelection()">✕ Hủy</button>
+    </div>
+
     <!-- Modal -->
     <div class="modal" id="taskModal">
         <div class="modal-content">
@@ -319,6 +354,7 @@
         let currentGroup = null;
         let currentPerson = null;
         let editingId = null;
+        let selectedTasks = new Set();
 
         // Dữ liệu mẫu
         const defaultData = [
@@ -436,6 +472,69 @@
             document.getElementById('lastUpdate').textContent = new Date().toLocaleString('vi-VN');
         }
 
+        // Toggle task selection
+        function toggleTask(id) {
+            if (selectedTasks.has(id)) {
+                selectedTasks.delete(id);
+            } else {
+                selectedTasks.add(id);
+            }
+            updateBulkActionsBar();
+        }
+
+        // Update bulk actions bar
+        function updateBulkActionsBar() {
+            const bar = document.getElementById('bulkActionsBar');
+            const count = document.getElementById('selectedCount');
+            
+            if (selectedTasks.size > 0) {
+                bar.classList.add('show');
+                count.textContent = selectedTasks.size;
+            } else {
+                bar.classList.remove('show');
+            }
+        }
+
+        // Bulk complete
+        function bulkComplete() {
+            if (selectedTasks.size === 0) return;
+            
+            if (confirm(`Đánh dấu hoàn thành ${selectedTasks.size} công việc?`)) {
+                selectedTasks.forEach(id => {
+                    const task = tasksData.find(t => t.id === id);
+                    if (task) {
+                        task.status = 'completed';
+                        task.progress = 100;
+                    }
+                });
+                
+                saveToStorage();
+                clearSelection();
+                updateStats();
+                switchView(currentView);
+            }
+        }
+
+        // Bulk delete
+        function bulkDelete() {
+            if (selectedTasks.size === 0) return;
+            
+            if (confirm(`Xóa ${selectedTasks.size} công việc? Không thể hoàn tác!`)) {
+                tasksData = tasksData.filter(t => !selectedTasks.has(t.id));
+                saveToStorage();
+                clearSelection();
+                updateStats();
+                switchView(currentView);
+            }
+        }
+
+        // Clear selection
+        function clearSelection() {
+            selectedTasks.clear();
+            updateBulkActionsBar();
+            switchView(currentView);
+        }
+
         // Chuyển view
         function switchView(view) {
             currentView = view;
@@ -519,8 +618,17 @@
             container.innerHTML = tasks.map(task => `
                 <div class="task-card ${task.status}">
                     <div class="task-actions">
-                        <button class="task-action-btn edit" onclick="editTask(${task.id})">✏️ Sửa</button>
-                        <button class="task-action-btn delete" onclick="deleteTask(${task.id})">🗑️ Xóa</button>
+                        <div style="display:flex;align-items:center;">
+                            <input type="checkbox" class="task-checkbox" 
+                                   id="check-${task.id}" 
+                                   onchange="toggleTask(${task.id})"
+                                   ${selectedTasks.has(task.id) ? 'checked' : ''}>
+                            <label for="check-${task.id}" style="cursor:pointer;user-select:none;">Chọn</label>
+                        </div>
+                        <div class="task-action-btns">
+                            <button class="task-action-btn edit" onclick="editTask(${task.id})">✏️ Sửa</button>
+                            <button class="task-action-btn delete" onclick="deleteTask(${task.id})">🗑️ Xóa</button>
+                        </div>
                     </div>
                     <span class="task-status-badge ${task.status}" onclick="changeStatus(${task.id})" title="Click để đổi trạng thái">
                         ${getStatusText(task.status)}
@@ -732,6 +840,7 @@
                         }
                         
                         const convertedData = rows.map((row, index) => {
+                            // Linh hoạt xử lý trạng thái
                             let status = 'pending';
                             let progress = 0;
                             
@@ -741,37 +850,43 @@
                                 progress = 100;
                             } else if (statusText.includes('đang') || statusText.includes('progress')) {
                                 status = 'inprogress';
-                                progress = parseInt(row['Tiến độ %'] || 50);
+                                progress = parseInt(row['Tiến độ %'] || row['Progress'] || 50);
                             }
                             
+                            // Linh hoạt xử lý deadline
                             let deadline = '';
-                            const deadlineValue = row['Deadline'] || row['Ngày deadline'] || '';
+                            const deadlineValue = row['Deadline'] || row['Ngày deadline'] || row['Hạn chót'] || '';
                             if (deadlineValue) {
-                                if (typeof deadlineValue === 'number') {
-                                    const date = XLSX.SSF.parse_date_code(deadlineValue);
-                                    deadline = `${date.y}-${String(date.m).padStart(2, '0')}-${String(date.d).padStart(2, '0')}`;
-                                } else {
-                                    deadline = deadlineValue.toString().split('T')[0];
+                                try {
+                                    if (typeof deadlineValue === 'number') {
+                                        const date = XLSX.SSF.parse_date_code(deadlineValue);
+                                        deadline = `${date.y}-${String(date.m).padStart(2, '0')}-${String(date.d).padStart(2, '0')}`;
+                                    } else {
+                                        deadline = deadlineValue.toString().split('T')[0];
+                                    }
+                                } catch (e) {
+                                    deadline = new Date().toISOString().split('T')[0];
                                 }
                             }
                             
+                            // Linh hoạt mapping các trường - bỏ qua các cột không liên quan
                             return {
-                                id: Date.now() + index,
-                                group: row['Nhóm việc'] || row['Group'] || 'Chưa phân nhóm',
-                                program: row['Chương trình'] || row['Program'] || '',
-                                title: row['Công việc cụ thể'] || row['Task'] || 'Công việc ' + (index + 1),
-                                description: row['Mô tả'] || row['Description'] || '',
-                                coordinator: row['Người điều phối'] || row['Coordinator'] || '',
-                                assignee: row['Người thực hiện'] || row['Assignee'] || 'Chưa phân công',
-                                approver: row['Người duyệt'] || row['Approver'] || '',
+                                id: Date.now() + index + Math.random(),
+                                group: row['Nhóm việc'] || row['Group'] || row['Nhom viec'] || 'Chưa phân nhóm',
+                                program: row['Chương trình'] || row['Program'] || row['Chuong trinh'] || '',
+                                title: row['Công việc cụ thể'] || row['Công việc'] || row['Task'] || row['Title'] || row['Cong viec'] || 'Công việc ' + (index + 1),
+                                description: row['Mô tả'] || row['Description'] || row['Mo ta'] || row['Ghi chú'] || '',
+                                coordinator: row['Người điều phối'] || row['Coordinator'] || row['Nguoi dieu phoi'] || row['Điều phối'] || '',
+                                assignee: row['Người thực hiện'] || row['Assignee'] || row['Nguoi thuc hien'] || row['Thực hiện'] || 'Chưa phân công',
+                                approver: row['Người duyệt'] || row['Approver'] || row['Nguoi duyet'] || row['Duyệt'] || '',
                                 deadline: deadline || new Date().toISOString().split('T')[0],
-                                frequency: row['Tần suất'] || row['Frequency'] || 'Một lần',
-                                requiredOutput: row['Đầu ra bắt buộc'] || row['Required Output'] || '',
+                                frequency: row['Tần suất'] || row['Frequency'] || row['Tan suat'] || 'Một lần',
+                                requiredOutput: row['Đầu ra bắt buộc'] || row['Required Output'] || row['Dau ra'] || row['Đầu ra'] || '',
                                 status: status,
                                 progress: progress,
                                 lastRecurDate: null
                             };
-                        });
+                        }).filter(task => task.title && task.title !== ''); // Bỏ qua dòng trống
                         
                         if (confirm(`Tìm thấy ${convertedData.length} công việc. Nhập dữ liệu sẽ ghi đè dữ liệu hiện tại. Tiếp tục?`)) {
                             tasksData = convertedData;
