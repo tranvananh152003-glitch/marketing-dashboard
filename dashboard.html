@@ -1,0 +1,489 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard Tiến Độ Marketing 2026</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        header {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            text-align: center;
+        }
+
+        header h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .last-update {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            padding: 25px;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            text-align: center;
+            transition: transform 0.3s;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+        }
+
+        .stat-icon {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+
+        .stat-value {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+
+        .stat-card.completed .stat-value {
+            color: #10b981;
+        }
+
+        .stat-card.progress .stat-value {
+            color: #f59e0b;
+        }
+
+        .stat-card.pending .stat-value {
+            color: #6b7280;
+        }
+
+        .stat-card.total .stat-value {
+            color: #3b82f6;
+        }
+
+        .stat-label {
+            color: #666;
+            font-size: 14px;
+        }
+
+        .filters {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .filter-btn {
+            padding: 10px 20px;
+            border: none;
+            border-radius: 25px;
+            background: white;
+            color: #333;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s;
+        }
+
+        .filter-btn:hover {
+            transform: scale(1.05);
+        }
+
+        .filter-btn.active {
+            background: #667eea;
+            color: white;
+        }
+
+        .tasks-container {
+            display: grid;
+            gap: 15px;
+        }
+
+        .task-card {
+            background: white;
+            padding: 20px;
+            border-radius: 12px;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.08);
+            border-left: 4px solid #ddd;
+            transition: all 0.3s;
+        }
+
+        .task-card:hover {
+            box-shadow: 0 5px 25px rgba(0,0,0,0.15);
+        }
+
+        .task-card.completed {
+            border-left-color: #10b981;
+            opacity: 0.9;
+        }
+
+        .task-card.inprogress {
+            border-left-color: #f59e0b;
+        }
+
+        .task-card.pending {
+            border-left-color: #6b7280;
+        }
+
+        .task-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+
+        .task-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #333;
+            flex: 1;
+        }
+
+        .task-status {
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 12px;
+            font-weight: 500;
+        }
+
+        .task-status.completed {
+            background: #d1fae5;
+            color: #065f46;
+        }
+
+        .task-status.inprogress {
+            background: #fef3c7;
+            color: #92400e;
+        }
+
+        .task-status.pending {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .task-info {
+            color: #666;
+            font-size: 14px;
+            line-height: 1.6;
+            margin-bottom: 10px;
+        }
+
+        .task-meta {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        .task-meta span {
+            font-size: 13px;
+            color: #888;
+        }
+
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 10px;
+            margin-top: 10px;
+            overflow: hidden;
+        }
+
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(90deg, #667eea, #764ba2);
+            transition: width 0.3s;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 10px;
+            }
+            
+            header h1 {
+                font-size: 22px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+                gap: 15px;
+            }
+            
+            .stat-card {
+                padding: 20px;
+            }
+            
+            .stat-icon {
+                font-size: 28px;
+            }
+            
+            .stat-value {
+                font-size: 24px;
+            }
+            
+            .task-title {
+                font-size: 16px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>📊 Bảng Theo Dõi Tiến Độ Marketing 2026</h1>
+            <div class="last-update">Cập nhật: <span id="lastUpdate"></span></div>
+        </header>
+
+        <div class="stats-grid">
+            <div class="stat-card completed">
+                <div class="stat-icon">✅</div>
+                <div class="stat-value" id="completedTasks">0</div>
+                <div class="stat-label">Hoàn thành</div>
+            </div>
+            <div class="stat-card progress">
+                <div class="stat-icon">⏳</div>
+                <div class="stat-value" id="inProgressTasks">0</div>
+                <div class="stat-label">Đang thực hiện</div>
+            </div>
+            <div class="stat-card pending">
+                <div class="stat-icon">📋</div>
+                <div class="stat-value" id="pendingTasks">0</div>
+                <div class="stat-label">Chưa bắt đầu</div>
+            </div>
+            <div class="stat-card total">
+                <div class="stat-icon">📈</div>
+                <div class="stat-value" id="progressPercent">0%</div>
+                <div class="stat-label">Tiến độ</div>
+            </div>
+        </div>
+
+        <div class="filters">
+            <button class="filter-btn active" data-filter="all">Tất cả</button>
+            <button class="filter-btn" data-filter="completed">Hoàn thành</button>
+            <button class="filter-btn" data-filter="inprogress">Đang làm</button>
+            <button class="filter-btn" data-filter="pending">Chưa bắt đầu</button>
+        </div>
+
+        <div class="tasks-container" id="tasksContainer"></div>
+    </div>
+
+    <script>
+        // DỮ LIỆU CÔNG VIỆC - CẬP NHẬT TẠI ĐÂY
+        const tasksData = [
+            {
+                id: 1,
+                title: "Lập kế hoạch chiến dịch Q1 2026",
+                status: "completed",
+                description: "Hoàn thành kế hoạch marketing chi tiết cho quý 1/2026 bao gồm mục tiêu, ngân sách và KPI",
+                deadline: "2026-01-15",
+                assignee: "Nguyễn Văn A",
+                progress: 100
+            },
+            {
+                id: 2,
+                title: "Thiết kế banner quảng cáo Facebook",
+                status: "inprogress",
+                description: "Thiết kế 10 mẫu banner cho chiến dịch Facebook Ads tháng 1",
+                deadline: "2026-01-20",
+                assignee: "Trần Thị B",
+                progress: 60
+            },
+            {
+                id: 3,
+                title: "Phân tích đối thủ cạnh tranh",
+                status: "pending",
+                description: "Nghiên cứu và phân tích chiến lược marketing của 5 đối thủ chính",
+                deadline: "2026-01-25",
+                assignee: "Lê Văn C",
+                progress: 0
+            },
+            {
+                id: 4,
+                title: "Viết content cho website",
+                status: "inprogress",
+                description: "Cập nhật nội dung trang chủ, landing page và 5 bài blog",
+                deadline: "2026-01-18",
+                assignee: "Phạm Thị D",
+                progress: 40
+            },
+            {
+                id: 5,
+                title: "Chuẩn bị báo cáo tháng 12/2025",
+                status: "completed",
+                description: "Tổng hợp và phân tích kết quả marketing tháng 12",
+                deadline: "2026-01-05",
+                assignee: "Nguyễn Văn A",
+                progress: 100
+            },
+            {
+                id: 6,
+                title: "Setup Google Analytics 4",
+                status: "inprogress",
+                description: "Cài đặt và cấu hình GA4 cho website mới",
+                deadline: "2026-01-22",
+                assignee: "Trần Văn E",
+                progress: 75
+            },
+            {
+                id: 7,
+                title: "Lên kế hoạch Email Marketing",
+                status: "pending",
+                description: "Thiết kế flow email automation cho khách hàng mới",
+                deadline: "2026-01-30",
+                assignee: "Phạm Thị D",
+                progress: 0
+            },
+            {
+                id: 8,
+                title: "Quay video giới thiệu sản phẩm",
+                status: "pending",
+                description: "Sản xuất 3 video ngắn cho TikTok và Instagram Reels",
+                deadline: "2026-02-05",
+                assignee: "Lê Thị F",
+                progress: 0
+            },
+            {
+                id: 9,
+                title: "Tối ưu SEO cho 10 từ khóa chính",
+                status: "inprogress",
+                description: "On-page SEO và link building cho các từ khóa mục tiêu",
+                deadline: "2026-01-28",
+                assignee: "Nguyễn Văn G",
+                progress: 30
+            },
+            {
+                id: 10,
+                title: "Thiết lập chiến dịch Google Ads",
+                status: "completed",
+                description: "Tạo và launch chiến dịch Google Search Ads cho sản phẩm mới",
+                deadline: "2026-01-10",
+                assignee: "Trần Văn E",
+                progress: 100
+            }
+        ];
+
+        // Cập nhật thống kê
+        function updateStats() {
+            const completed = tasksData.filter(t => t.status === 'completed').length;
+            const inProgress = tasksData.filter(t => t.status === 'inprogress').length;
+            const pending = tasksData.filter(t => t.status === 'pending').length;
+            const total = tasksData.length;
+            const percent = total > 0 ? Math.round((completed / total) * 100) : 0;
+
+            document.getElementById('completedTasks').textContent = completed;
+            document.getElementById('inProgressTasks').textContent = inProgress;
+            document.getElementById('pendingTasks').textContent = pending;
+            document.getElementById('progressPercent').textContent = percent + '%';
+            
+            const now = new Date();
+            document.getElementById('lastUpdate').textContent = now.toLocaleString('vi-VN', {
+                day: '2-digit',
+                month: '2-digit',
+                year: 'numeric',
+                hour: '2-digit',
+                minute: '2-digit'
+            });
+        }
+
+        // Hiển thị danh sách công việc
+        function renderTasks(filter = 'all') {
+            const container = document.getElementById('tasksContainer');
+            let filteredTasks = tasksData;
+
+            if (filter !== 'all') {
+                filteredTasks = tasksData.filter(task => task.status === filter);
+            }
+
+            if (filteredTasks.length === 0) {
+                container.innerHTML = '<div style="text-align:center; padding:40px; color:white; font-size:18px;">Không có công việc nào</div>';
+                return;
+            }
+
+            container.innerHTML = filteredTasks.map(task => `
+                <div class="task-card ${task.status}">
+                    <div class="task-header">
+                        <div class="task-title">${task.title}</div>
+                        <span class="task-status ${task.status}">
+                            ${getStatusText(task.status)}
+                        </span>
+                    </div>
+                    <div class="task-info">${task.description}</div>
+                    <div class="task-meta">
+                        <span>📅 Deadline: ${formatDate(task.deadline)}</span>
+                        <span>👤 ${task.assignee}</span>
+                        <span>📊 ${task.progress}%</span>
+                    </div>
+                    ${task.status !== 'completed' && task.status !== 'pending' ? `
+                    <div class="progress-bar">
+                        <div class="progress-fill" style="width: ${task.progress}%"></div>
+                    </div>
+                    ` : ''}
+                </div>
+            `).join('');
+        }
+
+        // Chuyển đổi trạng thái sang tiếng Việt
+        function getStatusText(status) {
+            const statusMap = {
+                'completed': 'Hoàn thành',
+                'inprogress': 'Đang thực hiện',
+                'pending': 'Chưa bắt đầu'
+            };
+            return statusMap[status] || status;
+        }
+
+        // Format ngày tháng
+        function formatDate(dateString) {
+            const date = new Date(dateString);
+            const day = date.getDate().toString().padStart(2, '0');
+            const month = (date.getMonth() + 1).toString().padStart(2, '0');
+            const year = date.getFullYear();
+            return `${day}/${month}/${year}`;
+        }
+
+        // Xử lý bộ lọc
+        document.querySelectorAll('.filter-btn').forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+                e.target.classList.add('active');
+                const filter = e.target.dataset.filter;
+                renderTasks(filter);
+            });
+        });
+
+        // Khởi tạo
+        updateStats();
+        renderTasks();
+    </script>
+</body>
+</html>
