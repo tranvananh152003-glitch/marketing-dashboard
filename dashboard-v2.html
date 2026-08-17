@@ -350,6 +350,16 @@
                     <input type="number" name="progress" min="0" max="100" value="0" required>
                 </div>
                 
+                <div class="form-group full-width">
+                    <label>Link nộp bài (tùy chọn)</label>
+                    <input type="url" name="submissionLink" placeholder="https://...">
+                </div>
+                
+                <div class="form-group full-width">
+                    <label>Ghi chú nộp bài (tùy chọn)</label>
+                    <input type="text" name="submissionNote" placeholder="Tên file hoặc ghi chú">
+                </div>
+                
                 <input type="hidden" name="id">
                 <div class="modal-actions">
                     <button type="button" class="btn" onclick="closeModal()" style="background:#6b7280;color:white;">Hủy</button>
@@ -384,7 +394,9 @@
                 status: "completed",
                 description: "Đăng bài quảng cáo sản phẩm",
                 progress: 100,
-                lastRecurDate: "2026-01-15"
+                lastRecurDate: "2026-01-15",
+                submissionLink: "",
+                submissionNote: ""
             },
             {
                 id: Date.now() + 2,
@@ -400,7 +412,9 @@
                 status: "inprogress",
                 description: "Setup booth cho triển lãm",
                 progress: 60,
-                lastRecurDate: null
+                lastRecurDate: null,
+                submissionLink: "https://drive.google.com/example",
+                submissionNote: "File thiết kế booth"
             }
         ];
 
@@ -435,7 +449,9 @@
                         status: 'pending',
                         progress: 0,
                         deadline: today,
-                        lastRecurDate: today
+                        lastRecurDate: today,
+                        submissionLink: '',
+                        submissionNote: ''
                     };
                     tasksData.push(newTask);
                     task.lastRecurDate = today;
@@ -516,15 +532,25 @@
 
         // Select all visible tasks
         function selectAll() {
-            const container = document.getElementById('tasksContainer');
-            const checkboxes = container.querySelectorAll('.task-checkbox');
+            // Get current displayed tasks
+            let displayedTasks = [];
             
-            checkboxes.forEach(checkbox => {
-                const id = parseInt(checkbox.id.replace('check-', ''));
-                if (!selectedTasks.has(id)) {
-                    selectedTasks.add(id);
-                    checkbox.checked = true;
-                }
+            if (currentView === 'all') {
+                displayedTasks = tasksData;
+            } else if (currentView === 'group' && currentGroup) {
+                displayedTasks = tasksData.filter(t => t.group === currentGroup);
+            } else if (currentView === 'people' && currentPerson) {
+                displayedTasks = tasksData.filter(t => t.assignee === currentPerson);
+            }
+            
+            // Select all displayed tasks
+            displayedTasks.forEach(task => {
+                selectedTasks.add(task.id);
+            });
+            
+            // Update checkboxes
+            document.querySelectorAll('.task-checkbox').forEach(checkbox => {
+                checkbox.checked = true;
             });
             
             updateBulkActionsBar();
@@ -553,7 +579,10 @@
 
         // Bulk complete
         function bulkComplete() {
-            if (selectedTasks.size === 0) return;
+            if (selectedTasks.size === 0) {
+                alert('Chưa chọn công việc nào!');
+                return;
+            }
             
             if (confirm(`Đánh dấu hoàn thành ${selectedTasks.size} công việc?`)) {
                 selectedTasks.forEach(id => {
@@ -565,20 +594,24 @@
                 });
                 
                 saveToStorage();
-                exitSelectionMode();
                 updateStats();
+                exitSelectionMode();
             }
         }
 
         // Bulk delete
         function bulkDelete() {
-            if (selectedTasks.size === 0) return;
+            if (selectedTasks.size === 0) {
+                alert('Chưa chọn công việc nào!');
+                return;
+            }
             
             if (confirm(`Xóa ${selectedTasks.size} công việc? Không thể hoàn tác!`)) {
-                tasksData = tasksData.filter(t => !selectedTasks.has(t.id));
+                const selectedIds = Array.from(selectedTasks);
+                tasksData = tasksData.filter(t => !selectedIds.includes(t.id));
                 saveToStorage();
-                exitSelectionMode();
                 updateStats();
+                exitSelectionMode();
             }
         }
 
@@ -696,6 +729,13 @@
                     <div style="margin-top:10px;padding:10px;background:#f0f9ff;border-radius:8px;">
                         <strong style="color:#0369a1;">📦 Đầu ra:</strong> ${task.requiredOutput}
                     </div>
+                    ${task.submissionLink || task.submissionNote ? `
+                    <div style="margin-top:10px;padding:10px;background:#f0fdf4;border-radius:8px;border-left:3px solid #10b981;">
+                        <strong style="color:#065f46;">📎 Đã nộp bài:</strong><br>
+                        ${task.submissionLink ? `<a href="${task.submissionLink}" target="_blank" style="color:#0891b2;text-decoration:none;">🔗 ${task.submissionLink}</a><br>` : ''}
+                        ${task.submissionNote ? `<span style="color:#065f46;">📄 ${task.submissionNote}</span>` : ''}
+                    </div>
+                    ` : ''}
                     ${task.status !== 'completed' && task.status !== 'pending' ? `
                     <div class="progress-bar">
                         <div class="progress-fill" style="width:${task.progress}%"></div>
@@ -734,6 +774,8 @@
             form.requiredOutput.value = task.requiredOutput;
             form.status.value = task.status;
             form.progress.value = task.progress;
+            form.submissionLink.value = task.submissionLink || '';
+            form.submissionNote.value = task.submissionNote || '';
             form.id.value = id;
             
             document.getElementById('taskModal').classList.add('active');
@@ -769,6 +811,8 @@
                 requiredOutput: formData.get('requiredOutput'),
                 status: formData.get('status'),
                 progress: parseInt(formData.get('progress')),
+                submissionLink: formData.get('submissionLink') || '',
+                submissionNote: formData.get('submissionNote') || '',
                 lastRecurDate: formData.get('frequency') === 'Hàng ngày' ? new Date().toISOString().split('T')[0] : null
             };
 
@@ -959,6 +1003,8 @@
                                 requiredOutput: row['Đầu ra bắt buộc'] || row['Required Output'] || row['Dau ra'] || row['Đầu ra'] || '',
                                 status: status,
                                 progress: progress,
+                                submissionLink: '',
+                                submissionNote: '',
                                 lastRecurDate: null
                             };
                         }).filter(task => task.title && task.title !== '' && task.title !== 'Công việc NaN'); // Bỏ qua dòng trống
