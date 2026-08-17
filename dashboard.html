@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Tiến Độ Marketing 2026</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -415,7 +416,8 @@
             <div class="header-actions">
                 <button class="btn btn-success" onclick="openAddModal()">➕ Thêm công việc</button>
                 <button class="btn btn-primary" onclick="exportData()">💾 Xuất dữ liệu</button>
-                <button class="btn btn-danger" onclick="importData()">📥 Nhập dữ liệu</button>
+                <button class="btn btn-danger" onclick="importJSON()">📥 Nhập JSON</button>
+                <button class="btn btn-primary" onclick="importExcel()">📊 Nhập Excel</button>
             </div>
             <div class="last-update">Cập nhật: <span id="lastUpdate"></span></div>
         </header>
@@ -718,8 +720,8 @@
             a.click();
         }
 
-        // Nhập dữ liệu
-        function importData() {
+        // Nhập dữ liệu JSON
+        function importJSON() {
             const input = document.createElement('input');
             input.type = 'file';
             input.accept = '.json';
@@ -741,6 +743,84 @@
                     }
                 };
                 reader.readAsText(file);
+            };
+            input.click();
+        }
+
+        // Nhập dữ liệu từ Excel
+        function importExcel() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.xlsx,.xls';
+            input.onchange = e => {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                reader.onload = event => {
+                    try {
+                        const data = new Uint8Array(event.target.result);
+                        const workbook = XLSX.read(data, { type: 'array' });
+                        
+                        // Đọc sheet đầu tiên
+                        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                        const rows = XLSX.utils.sheet_to_json(firstSheet);
+                        
+                        if (rows.length === 0) {
+                            alert('File Excel không có dữ liệu!');
+                            return;
+                        }
+                        
+                        // Chuyển đổi dữ liệu Excel sang format của app
+                        const convertedData = rows.map((row, index) => {
+                            // Xác định trạng thái
+                            let status = 'pending';
+                            let progress = 0;
+                            
+                            const statusText = (row['Trạng thái'] || row['Status'] || '').toString().toLowerCase();
+                            if (statusText.includes('hoàn thành') || statusText.includes('completed') || statusText.includes('done')) {
+                                status = 'completed';
+                                progress = 100;
+                            } else if (statusText.includes('đang') || statusText.includes('progress') || statusText.includes('doing')) {
+                                status = 'inprogress';
+                                progress = parseInt(row['Tiến độ %'] || row['Progress'] || 50);
+                            }
+                            
+                            // Xử lý deadline
+                            let deadline = '';
+                            const deadlineValue = row['Deadline'] || row['Ngày deadline'] || row['Hạn chót'] || '';
+                            if (deadlineValue) {
+                                if (typeof deadlineValue === 'number') {
+                                    // Excel date serial number
+                                    const date = XLSX.SSF.parse_date_code(deadlineValue);
+                                    deadline = `${date.y}-${String(date.m).padStart(2, '0')}-${String(date.d).padStart(2, '0')}`;
+                                } else {
+                                    deadline = deadlineValue.toString().split('T')[0];
+                                }
+                            }
+                            
+                            return {
+                                id: Date.now() + index,
+                                title: row['Tên công việc'] || row['Công việc'] || row['Task'] || row['Title'] || 'Công việc ' + (index + 1),
+                                description: row['Mô tả'] || row['Description'] || row['Ghi chú'] || '',
+                                assignee: row['Người phụ trách'] || row['Assignee'] || row['Owner'] || 'Chưa phân công',
+                                deadline: deadline || new Date().toISOString().split('T')[0],
+                                status: status,
+                                progress: progress
+                            };
+                        });
+                        
+                        if (confirm(`Tìm thấy ${convertedData.length} công việc trong Excel.\nNhập dữ liệu sẽ ghi đè dữ liệu hiện tại. Tiếp tục?`)) {
+                            tasksData = convertedData;
+                            saveToStorage();
+                            updateStats();
+                            renderTasks(currentFilter);
+                            alert('Nhập dữ liệu Excel thành công!');
+                        }
+                    } catch (err) {
+                        console.error(err);
+                        alert('Lỗi khi đọc file Excel: ' + err.message);
+                    }
+                };
+                reader.readAsArrayBuffer(file);
             };
             input.click();
         }
