@@ -177,71 +177,112 @@
         }
 
         .person-tabs {
-            display: flex;
-            gap: 10px;
+            display: block;
             margin-bottom: 20px;
-            flex-wrap: wrap;
-            justify-content: center;
-            padding: 15px;
-            background: rgba(255,255,255,0.1);
+            padding: 20px;
+            background: white;
             border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
         }
 
-        .person-tab {
-            padding: 10px 20px;
-            border: none;
-            border-radius: 25px;
+        .person-tabs-label {
+            font-size: 16px;
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 15px;
+        }
+
+        .person-select {
+            width: 100%;
+            padding: 15px 20px;
+            font-size: 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
             background: white;
             color: #333;
             cursor: pointer;
-            font-size: 14px;
-            font-weight: 500;
             transition: all 0.3s;
-            display: flex;
-            align-items: center;
-            gap: 8px;
+            font-weight: 500;
         }
 
-        .person-tab:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        .person-select:hover {
+            border-color: #667eea;
         }
 
-        .person-tab.active {
-            background: #667eea;
-            color: white;
+        .person-select:focus {
+            outline: none;
+            border-color: #667eea;
+            box-shadow: 0 0 0 3px rgba(102, 126, 234, 0.1);
         }
 
-        .person-tab-avatar {
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, #667eea, #764ba2);
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-            font-weight: bold;
+        .person-select option {
+            padding: 10px;
         }
 
-        .person-tab.active .person-tab-avatar {
-            background: white;
-            color: #667eea;
-        }
-
-        .person-tab-count {
-            background: #e0e7ff;
-            color: #4338ca;
-            padding: 2px 8px;
+        .file-upload-area {
+            margin-top: 10px;
+            padding: 20px;
+            border: 2px dashed #d1d5db;
             border-radius: 10px;
-            font-size: 11px;
-            font-weight: 600;
+            background: #f9fafb;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
         }
 
-        .person-tab.active .person-tab-count {
-            background: rgba(255,255,255,0.3);
+        .file-upload-area:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+        }
+
+        .file-upload-area.dragover {
+            border-color: #667eea;
+            background: #e0e7ff;
+        }
+
+        .file-upload-icon {
+            font-size: 36px;
+            margin-bottom: 10px;
+        }
+
+        .file-upload-text {
+            color: #6b7280;
+            font-size: 14px;
+        }
+
+        .uploaded-files {
+            margin-top: 10px;
+        }
+
+        .uploaded-file-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px;
+            background: #e0e7ff;
+            border-radius: 8px;
+            margin-top: 8px;
+            font-size: 13px;
+        }
+
+        .uploaded-file-name {
+            flex: 1;
+            color: #4338ca;
+            word-break: break-all;
+        }
+
+        .remove-file-btn {
+            background: #ef4444;
             color: white;
+            border: none;
+            padding: 4px 8px;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 11px;
+        }
+
+        .remove-file-btn:hover {
+            background: #dc2626;
         }
 
         .people-grid {
@@ -697,7 +738,11 @@
             <button class="view-tab" onclick="switchView('people')">👥 Theo người</button>
         </div>
 
-        <div id="personTabs" class="person-tabs" style="display:none;"></div>
+        <div id="personTabs" class="person-tabs" style="display:none;">
+            <div class="person-tabs-label">👤 Chọn người xem công việc:</div>
+            <select id="personSelect" class="person-select" onchange="switchPerson(this.value)">
+            </select>
+        </div>
 
         <div id="allTasksView">
             <div class="filters">
@@ -755,10 +800,20 @@
                     <input type="url" name="submissionLink" placeholder="https://...">
                 </div>
                 <div class="form-group">
+                    <label>Hoặc upload file</label>
+                    <div class="file-upload-area" id="fileUploadArea" onclick="document.getElementById('fileInput').click()">
+                        <div class="file-upload-icon">📁</div>
+                        <div class="file-upload-text">Click để chọn file hoặc kéo thả vào đây</div>
+                        <input type="file" id="fileInput" multiple style="display:none" onchange="handleFileSelect(event)">
+                    </div>
+                    <div id="uploadedFilesList" class="uploaded-files"></div>
+                </div>
+                <div class="form-group">
                     <label>Ghi chú nộp bài (tùy chọn)</label>
-                    <input type="text" name="submissionNote" placeholder="Tên file hoặc ghi chú">
+                    <input type="text" name="submissionNote" placeholder="Ghi chú thêm...">
                 </div>
                 <input type="hidden" name="id">
+                <input type="hidden" name="uploadedFilesData" id="uploadedFilesData">
                 <div class="modal-actions">
                     <button type="button" class="btn" onclick="closeModal()" style="background: #6b7280; color: white;">Hủy</button>
                     <button type="submit" class="btn btn-success">Lưu</button>
@@ -773,6 +828,7 @@
         let editingId = null;
         let currentView = 'all';
         let currentPerson = null;
+        let uploadedFiles = {}; // Store uploaded files by task ID
 
         // Dữ liệu mẫu ban đầu
         const defaultData = [
@@ -860,7 +916,7 @@
             }
         }
 
-        // Render tabs cho từng người
+        // Render tabs cho từng người - Dùng dropdown thay vì tabs
         function renderPersonTabs() {
             const peopleMap = {};
             
@@ -872,21 +928,15 @@
                 peopleMap[task.assignee]++;
             });
             
-            const people = Object.keys(peopleMap);
-            const tabsContainer = document.getElementById('personTabs');
+            const people = Object.keys(peopleMap).sort();
+            const selectElement = document.getElementById('personSelect');
             
-            tabsContainer.innerHTML = people.map((person, index) => {
-                const initial = person.charAt(0).toUpperCase();
+            selectElement.innerHTML = people.map(person => {
                 const count = peopleMap[person];
-                const isActive = (currentPerson === person) || (currentPerson === null && index === 0);
+                const initial = person.charAt(0).toUpperCase();
+                const isSelected = (currentPerson === person) || (currentPerson === null && people[0] === person);
                 
-                return `
-                    <button class="person-tab ${isActive ? 'active' : ''}" onclick="switchPerson('${person.replace(/'/g, "\\'")}')">
-                        <div class="person-tab-avatar">${initial}</div>
-                        <span>${person}</span>
-                        <span class="person-tab-count">${count}</span>
-                    </button>
-                `;
+                return `<option value="${person}" ${isSelected ? 'selected' : ''}>${initial} ${person} (${count} công việc)</option>`;
             }).join('');
             
             // Nếu chưa chọn người nào, chọn người đầu tiên
@@ -900,10 +950,93 @@
         // Chuyển sang xem công việc của người khác
         function switchPerson(person) {
             currentPerson = person;
-            document.querySelectorAll('.person-tab').forEach(tab => tab.classList.remove('active'));
-            event.target.closest('.person-tab').classList.add('active');
             renderPersonTasks();
         }
+
+        // Xử lý file upload
+        let tempFiles = [];
+
+        function handleFileSelect(event) {
+            const files = event.target.files;
+            if (files.length === 0) return;
+            
+            for (let file of files) {
+                // Convert to base64 for storage
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    tempFiles.push({
+                        name: file.name,
+                        size: file.size,
+                        type: file.type,
+                        data: e.target.result
+                    });
+                    updateUploadedFilesList();
+                };
+                reader.readAsDataURL(file);
+            }
+            
+            // Reset input
+            event.target.value = '';
+        }
+
+        function updateUploadedFilesList() {
+            const listContainer = document.getElementById('uploadedFilesList');
+            if (tempFiles.length === 0) {
+                listContainer.innerHTML = '';
+                return;
+            }
+            
+            listContainer.innerHTML = tempFiles.map((file, index) => `
+                <div class="uploaded-file-item">
+                    <span>📄</span>
+                    <span class="uploaded-file-name">${file.name} (${(file.size / 1024).toFixed(1)} KB)</span>
+                    <button type="button" class="remove-file-btn" onclick="removeUploadedFile(${index})">✕</button>
+                </div>
+            `).join('');
+            
+            // Store in hidden field
+            document.getElementById('uploadedFilesData').value = JSON.stringify(tempFiles);
+        }
+
+        function removeUploadedFile(index) {
+            tempFiles.splice(index, 1);
+            updateUploadedFilesList();
+        }
+
+        // Drag and drop support
+        document.addEventListener('DOMContentLoaded', function() {
+            const uploadArea = document.getElementById('fileUploadArea');
+            if (uploadArea) {
+                uploadArea.addEventListener('dragover', function(e) {
+                    e.preventDefault();
+                    this.classList.add('dragover');
+                });
+                
+                uploadArea.addEventListener('dragleave', function() {
+                    this.classList.remove('dragover');
+                });
+                
+                uploadArea.addEventListener('drop', function(e) {
+                    e.preventDefault();
+                    this.classList.remove('dragover');
+                    
+                    const files = e.dataTransfer.files;
+                    for (let file of files) {
+                        const reader = new FileReader();
+                        reader.onload = function(ev) {
+                            tempFiles.push({
+                                name: file.name,
+                                size: file.size,
+                                type: file.type,
+                                data: ev.target.result
+                            });
+                            updateUploadedFilesList();
+                        };
+                        reader.readAsDataURL(file);
+                    }
+                });
+            }
+        });
 
         // Hiển thị công việc của người được chọn
         function renderPersonTasks() {
@@ -952,6 +1085,9 @@
                                         <div class="submission-content">
                                             ${task.submissionLink ? `<a href="${task.submissionLink}" target="_blank" class="submission-link" onclick="event.stopPropagation()">🔗 ${task.submissionLink}</a>` : ''}
                                             ${task.submissionNote ? `<span class="submission-file">📄 ${task.submissionNote}</span>` : ''}
+                                            ${task.submissionFiles && task.submissionFiles.length > 0 ? task.submissionFiles.map(f => `
+                                                <a href="${f.data}" download="${f.name}" class="submission-link" onclick="event.stopPropagation()">📎 ${f.name}</a>
+                                            `).join('') : ''}
                                         </div>
                                     </div>
                                     ` : `
@@ -1056,6 +1192,9 @@
                         <div class="submission-content">
                             ${task.submissionLink ? `<a href="${task.submissionLink}" target="_blank" class="submission-link" onclick="event.stopPropagation()">🔗 ${task.submissionLink}</a>` : ''}
                             ${task.submissionNote ? `<span class="submission-file">📄 ${task.submissionNote}</span>` : ''}
+                            ${task.submissionFiles && task.submissionFiles.length > 0 ? task.submissionFiles.map(f => `
+                                <a href="${f.data}" download="${f.name}" class="submission-link" onclick="event.stopPropagation()">📎 ${f.name}</a>
+                            `).join('') : ''}
                         </div>
                     </div>
                     ` : ''}
@@ -1124,8 +1263,10 @@
         // Mở modal thêm
         function openAddModal() {
             editingId = null;
+            tempFiles = [];
             document.getElementById('modalTitle').textContent = 'Thêm công việc mới';
             document.getElementById('taskForm').reset();
+            document.getElementById('uploadedFilesList').innerHTML = '';
             document.getElementById('taskModal').classList.add('active');
         }
 
@@ -1135,6 +1276,7 @@
             if (!task) return;
 
             editingId = id;
+            tempFiles = task.submissionFiles || [];
             document.getElementById('modalTitle').textContent = 'Sửa công việc';
             const form = document.getElementById('taskForm');
             form.title.value = task.title;
@@ -1147,6 +1289,7 @@
             form.submissionNote.value = task.submissionNote || '';
             form.id.value = id;
             
+            updateUploadedFilesList();
             document.getElementById('taskModal').classList.add('active');
         }
 
@@ -1179,7 +1322,8 @@
                 status: formData.get('status'),
                 progress: parseInt(formData.get('progress')),
                 submissionLink: formData.get('submissionLink') || '',
-                submissionNote: formData.get('submissionNote') || ''
+                submissionNote: formData.get('submissionNote') || '',
+                submissionFiles: tempFiles || []
             };
 
             if (editingId) {
