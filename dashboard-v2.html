@@ -122,6 +122,56 @@
             display: flex;
         }
         
+        .submission-section {
+            margin-top: 15px;
+            padding: 12px;
+            background: #f0fdf4;
+            border-radius: 8px;
+            border-left: 3px solid #10b981;
+        }
+        
+        .submission-label {
+            font-size: 13px;
+            color: #065f46;
+            font-weight: 600;
+            margin-bottom: 8px;
+        }
+        
+        .submission-content {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        
+        .submission-link {
+            font-size: 12px;
+            color: #0891b2;
+            word-break: break-all;
+        }
+        
+        .submission-file {
+            font-size: 12px;
+            color: #059669;
+        }
+        
+        .submit-btn {
+            padding: 8px 16px;
+            background: #10b981;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s;
+        }
+        
+        .submit-btn:hover {
+            background: #059669;
+            transform: translateY(-2px);
+        }
+        
         .task-actions {
             display: flex; gap: 8px; margin-bottom: 10px; justify-content: space-between;
             align-items: center;
@@ -272,6 +322,38 @@
         <button class="bulk-btn complete" onclick="bulkComplete()">✅ Hoàn thành</button>
         <button class="bulk-btn delete" onclick="bulkDelete()">🗑️ Xóa</button>
         <button class="bulk-btn cancel" onclick="exitSelectionMode()">✕ Thoát</button>
+    </div>
+
+    <!-- Modal Nộp bài -->
+    <div class="modal" id="submitModal">
+        <div class="modal-content">
+            <div class="modal-header">📤 Nộp bài</div>
+            <form id="submitForm" onsubmit="saveSubmission(event)">
+                <div class="form-group">
+                    <label>Link nộp bài (Google Drive, Figma, ...)</label>
+                    <input type="url" name="submissionLink" placeholder="https://...">
+                </div>
+                
+                <div class="form-group">
+                    <label>Ghi chú</label>
+                    <input type="text" name="submissionNote" placeholder="VD: File đã gửi email, Đã in 100 tờ rơi">
+                </div>
+                
+                <div class="form-group">
+                    <label style="display:flex;align-items:center;gap:10px;">
+                        <input type="checkbox" id="markCompleteCheck" style="width:20px;height:20px;">
+                        <span>Đánh dấu công việc đã hoàn thành</span>
+                    </label>
+                </div>
+                
+                <input type="hidden" name="taskId">
+                
+                <div class="modal-actions">
+                    <button type="button" class="btn" onclick="closeSubmitModal()" style="background:#6b7280;color:white;">Hủy</button>
+                    <button type="submit" class="btn btn-success">Nộp</button>
+                </div>
+            </form>
+        </div>
     </div>
 
     <!-- Modal -->
@@ -730,10 +812,16 @@
                         <strong style="color:#0369a1;">📦 Đầu ra:</strong> ${task.requiredOutput}
                     </div>
                     ${task.submissionLink || task.submissionNote ? `
-                    <div style="margin-top:10px;padding:10px;background:#f0fdf4;border-radius:8px;border-left:3px solid #10b981;">
-                        <strong style="color:#065f46;">📎 Đã nộp bài:</strong><br>
-                        ${task.submissionLink ? `<a href="${task.submissionLink}" target="_blank" style="color:#0891b2;text-decoration:none;">🔗 ${task.submissionLink}</a><br>` : ''}
-                        ${task.submissionNote ? `<span style="color:#065f46;">📄 ${task.submissionNote}</span>` : ''}
+                    <div class="submission-section">
+                        <div class="submission-label">📎 Đã nộp bài:</div>
+                        <div class="submission-content">
+                            ${task.submissionLink ? `<a href="${task.submissionLink}" target="_blank" class="submission-link" onclick="event.stopPropagation()">🔗 ${task.submissionLink}</a>` : ''}
+                            ${task.submissionNote ? `<span class="submission-file">📄 ${task.submissionNote}</span>` : ''}
+                        </div>
+                    </div>
+                    ` : task.status !== 'completed' ? `
+                    <div style="margin-top:10px;">
+                        <button class="submit-btn" onclick="openSubmitModal(${task.id})">📤 Nộp bài</button>
                     </div>
                     ` : ''}
                     ${task.status !== 'completed' && task.status !== 'pending' ? `
@@ -743,6 +831,56 @@
                     ` : ''}
                 </div>
             `).join('');
+        }
+
+        // Mở modal nộp bài
+        function openSubmitModal(id) {
+            const task = tasksData.find(t => t.id === id);
+            if (!task) return;
+            
+            const form = document.getElementById('submitForm');
+            form.submissionLink.value = task.submissionLink || '';
+            form.submissionNote.value = task.submissionNote || '';
+            form.taskId.value = id;
+            document.getElementById('markCompleteCheck').checked = false;
+            
+            document.getElementById('submitModal').classList.add('active');
+        }
+
+        // Đóng modal nộp bài
+        function closeSubmitModal() {
+            document.getElementById('submitModal').classList.remove('active');
+        }
+
+        // Lưu nộp bài
+        function saveSubmission(e) {
+            e.preventDefault();
+            const form = e.target;
+            const formData = new FormData(form);
+            const taskId = parseInt(formData.get('taskId'));
+            
+            const task = tasksData.find(t => t.id === taskId);
+            if (!task) return;
+            
+            task.submissionLink = formData.get('submissionLink') || '';
+            task.submissionNote = formData.get('submissionNote') || '';
+            
+            // Nếu tick hoàn thành
+            if (document.getElementById('markCompleteCheck').checked) {
+                task.status = 'completed';
+                task.progress = 100;
+            }
+            
+            saveToStorage();
+            closeSubmitModal();
+            updateStats();
+            switchView(currentView);
+            
+            if (task.status === 'completed') {
+                alert('Đã nộp bài và đánh dấu hoàn thành! ✅');
+            } else {
+                alert('Đã nộp bài thành công! 📤');
+            }
         }
 
         // Mở modal thêm
@@ -1014,11 +1152,19 @@
                             saveToStorage();
                             updateStats();
                             switchView('all');
-                            alert('Nhập Excel thành công!');
+                            
+                            // Thông báo thành công không có alert lỗi
+                            const successMsg = `✅ Import thành công!\n\n` +
+                                             `📊 Tổng: ${convertedData.length} công việc\n` +
+                                             `✓ Hoàn thành: ${convertedData.filter(t => t.status === 'completed').length}\n` +
+                                             `⏳ Đang làm: ${convertedData.filter(t => t.status === 'inprogress').length}\n` +
+                                             `📋 Chưa bắt đầu: ${convertedData.filter(t => t.status === 'pending').length}`;
+                            
+                            alert(successMsg);
                         }
                     } catch (err) {
-                        console.error(err);
-                        alert('Lỗi khi đọc file Excel: ' + err.message);
+                        console.error('Excel import error:', err);
+                        alert('⚠️ Có lỗi khi đọc file Excel.\n\nVui lòng kiểm tra:\n- File có đúng định dạng .xlsx hoặc .xls\n- Có cột "Công việc cụ thể" hoặc "Task"\n- Dữ liệu bắt đầu từ dòng 2\n\nLỗi: ' + err.message);
                     }
                 };
                 reader.readAsArrayBuffer(file);
@@ -1029,6 +1175,10 @@
         // Đóng modal khi click ngoài
         document.getElementById('taskModal').addEventListener('click', (e) => {
             if (e.target.id === 'taskModal') closeModal();
+        });
+        
+        document.getElementById('submitModal').addEventListener('click', (e) => {
+            if (e.target.id === 'submitModal') closeSubmitModal();
         });
 
         // Khởi tạo
