@@ -496,7 +496,12 @@
             localStorage.setItem('marketingTasksV2', JSON.stringify(tasksData));
         }
 
-        function checkRecurringTasks() { /* Disabled */ };
+        function checkRecurringTasks() {
+            const today = new Date().toISOString().split('T')[0];
+            let updated = false;
+            tasksData.forEach(task => {
+                if (task.frequency === 'Hàng ngày' && task.lastRecurDate !== today) {
+                    const newTask = {...task, id: Date.now() + Math.random(), status: 'pending', progress: 0, deadline: today, lastRecurDate: today, submissionLink: '', submissionNote: ''};
                     tasksData.push(newTask);
                     task.lastRecurDate = today;
                     updated = true;
@@ -1024,4 +1029,3 @@
     </script>
 </body>
 </html>
-
