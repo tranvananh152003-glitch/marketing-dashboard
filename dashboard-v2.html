@@ -63,6 +63,58 @@
         .view-tab:hover { background: rgba(255,255,255,0.3); }
         .view-tab.active { background: white; color: #667eea; }
         
+        .group-tabs, .person-tabs {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            padding: 15px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+        
+        .group-tab, .person-tab {
+            padding: 12px 20px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            background: white;
+            color: #333;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .group-tab:hover, .person-tab:hover {
+            border-color: #667eea;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
+        }
+        
+        .group-tab.active, .person-tab.active {
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
+        }
+        
+        .tab-count {
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
+        }
+        
+        .group-tab.active .tab-count, .person-tab.active .tab-count {
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
+        }
+        
         .group-select-container {
             background: white; padding: 20px; border-radius: 15px;
             box-shadow: 0 5px 20px rgba(0,0,0,0.1); margin-bottom: 20px;
@@ -301,6 +353,10 @@
             <button class="view-tab" onclick="switchView('group')">📁 Theo nhóm việc</button>
             <button class="view-tab" onclick="switchView('people')">👥 Theo người</button>
         </div>
+
+        <div id="groupTabs" class="group-tabs" style="display:none;"></div>
+
+        <div id="personTabs" class="person-tabs" style="display:none;"></div>
 
         <div id="groupSelectContainer" class="group-select-container" style="display:none;">
             <div class="group-select-label">📁 Chọn nhóm việc:</div>
@@ -582,6 +638,34 @@
             document.getElementById('lastUpdate').textContent = new Date().toLocaleString('vi-VN');
         }
 
+        // Chuyển nhóm
+        function switchGroup(group) {
+            currentGroup = group;
+            
+            // Update active state
+            document.querySelectorAll('.group-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.closest('.group-tab').classList.add('active');
+            
+            const filtered = tasksData.filter(t => t.group === group);
+            renderTasks(filtered);
+        }
+
+        // Chuyển người
+        function switchPerson(person) {
+            currentPerson = person;
+            
+            // Update active state
+            document.querySelectorAll('.person-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.closest('.person-tab').classList.add('active');
+            
+            const filtered = tasksData.filter(t => t.assignee === person);
+            renderTasks(filtered);
+        }
+
         // Toggle selection mode
         function toggleSelectionMode() {
             selectionMode = !selectionMode;
@@ -701,33 +785,57 @@
         function switchView(view) {
             currentView = view;
             document.querySelectorAll('.view-tab').forEach(tab => tab.classList.remove('active'));
-            event.target.classList.add('active');
+            if (event && event.target) {
+                event.target.classList.add('active');
+            }
             
-            document.getElementById('groupSelectContainer').style.display = 'none';
-            document.getElementById('personSelectContainer').style.display = 'none';
+            document.getElementById('groupTabs').style.display = 'none';
+            document.getElementById('personTabs').style.display = 'none';
             
             if (view === 'all') {
                 renderTasks(tasksData);
             } else if (view === 'group') {
-                document.getElementById('groupSelectContainer').style.display = 'block';
-                renderGroupSelect();
+                document.getElementById('groupTabs').style.display = 'flex';
+                renderGroupTabs();
             } else if (view === 'people') {
-                document.getElementById('personSelectContainer').style.display = 'block';
-                renderPersonSelect();
+                document.getElementById('personTabs').style.display = 'flex';
+                renderPersonTabs();
             }
         }
 
-        // Render group select
-        function renderGroupSelect() {
-            const groups = [...new Set(tasksData.map(t => t.group))].sort();
-            const select = document.getElementById('groupSelect');
+        // Render group tabs
+        function renderGroupTabs() {
+            const groupsMap = {};
             
-            select.innerHTML = groups.map((group, index) => {
-                const count = tasksData.filter(t => t.group === group).length;
-                const isSelected = (currentGroup === group) || (currentGroup === null && index === 0);
-                return `<option value="${group}" ${isSelected ? 'selected' : ''}>${group} (${count} công việc)</option>`;
+            // Đếm số công việc của mỗi nhóm
+            tasksData.forEach(task => {
+                if (!groupsMap[task.group]) {
+                    groupsMap[task.group] = 0;
+                }
+                groupsMap[task.group]++;
+            });
+            
+            const groups = Object.keys(groupsMap).sort();
+            const container = document.getElementById('groupTabs');
+            
+            if (groups.length === 0) {
+                container.innerHTML = '<div style="padding:20px;color:#666;">Chưa có nhóm việc nào</div>';
+                return;
+            }
+            
+            container.innerHTML = groups.map((group, index) => {
+                const count = groupsMap[group];
+                const isActive = (currentGroup === group) || (currentGroup === null && index === 0);
+                
+                return `
+                    <button class="group-tab ${isActive ? 'active' : ''}" onclick="switchGroup('${group.replace(/'/g, "\\'")}')">
+                        <span>${group}</span>
+                        <span class="tab-count">${count}</span>
+                    </button>
+                `;
             }).join('');
             
+            // Nếu chưa chọn nhóm nào, chọn nhóm đầu tiên
             if (currentGroup === null && groups.length > 0) {
                 currentGroup = groups[0];
             }
@@ -735,37 +843,44 @@
             switchGroup(currentGroup);
         }
 
-        // Chuyển nhóm
-        function switchGroup(group) {
-            currentGroup = group;
-            const filtered = tasksData.filter(t => t.group === group);
-            renderTasks(filtered);
-        }
-
-        // Render person select
-        function renderPersonSelect() {
-            const people = [...new Set(tasksData.map(t => t.assignee))].sort();
-            const select = document.getElementById('personSelect');
+        // Render person tabs
+        function renderPersonTabs() {
+            const peopleMap = {};
             
-            select.innerHTML = people.map((person, index) => {
-                const count = tasksData.filter(t => t.assignee === person).length;
-                const isSelected = (currentPerson === person) || (currentPerson === null && index === 0);
-                const initial = person.charAt(0).toUpperCase();
-                return `<option value="${person}" ${isSelected ? 'selected' : ''}>${initial} ${person} (${count} công việc)</option>`;
+            // Đếm số công việc của mỗi người
+            tasksData.forEach(task => {
+                if (!peopleMap[task.assignee]) {
+                    peopleMap[task.assignee] = 0;
+                }
+                peopleMap[task.assignee]++;
+            });
+            
+            const people = Object.keys(peopleMap).sort();
+            const container = document.getElementById('personTabs');
+            
+            if (people.length === 0) {
+                container.innerHTML = '<div style="padding:20px;color:#666;">Chưa có người thực hiện nào</div>';
+                return;
+            }
+            
+            container.innerHTML = people.map((person, index) => {
+                const count = peopleMap[person];
+                const isActive = (currentPerson === person) || (currentPerson === null && index === 0);
+                
+                return `
+                    <button class="person-tab ${isActive ? 'active' : ''}" onclick="switchPerson('${person.replace(/'/g, "\\'")}')">
+                        <span>${person}</span>
+                        <span class="tab-count">${count}</span>
+                    </button>
+                `;
             }).join('');
             
+            // Nếu chưa chọn người nào, chọn người đầu tiên
             if (currentPerson === null && people.length > 0) {
                 currentPerson = people[0];
             }
             
             switchPerson(currentPerson);
-        }
-
-        // Chuyển người
-        function switchPerson(person) {
-            currentPerson = person;
-            const filtered = tasksData.filter(t => t.assignee === person);
-            renderTasks(filtered);
         }
 
         // Hiển thị tasks
