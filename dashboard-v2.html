@@ -6,6 +6,24 @@
     <title>Dashboard Marketing 2026 - V2</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <style>
+    <script type='module'>
+        import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
+        import { getFirestore, collection, getDocs, addDoc, updateDoc, deleteDoc, doc, onSnapshot } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js';
+        
+        const firebaseConfig = {
+            apiKey: 'AIzaSyByepfQv2Dm_pAVnbtJWv5EOf0q_HczI5M',
+            authDomain: 'marketing-dashboardv1.firebaseapp.com',
+            projectId: 'marketing-dashboardv1',
+            storageBucket: 'marketing-dashboardv1.firebasestorage.app',
+            messagingSenderId: '619601090265',
+            appId: '1:619601090265:web:149ad6e8836556670e10c8'
+        };
+        
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        window.db = db;
+        window.firestoreFunctions = { collection, getDocs, addDoc, updateDoc, deleteDoc, doc, onSnapshot };
+    </script>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
