@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
@@ -174,54 +174,54 @@
 <body>
     <div class="container">
         <header>
-            <h1>📊 Bảng Theo Dõi Marketing 2026</h1>
+            <h1>ðŸ“Š Báº£ng Theo DÃµi Marketing 2026</h1>
             <div class="header-actions">
-                <button class="btn btn-success" onclick="openAddModal()">➕ Thêm công việc</button>
-                <button class="btn btn-primary" onclick="exportData()">💾 Xuất dữ liệu</button>
-                <button class="btn btn-danger" onclick="importJSON()">📥 Nhập JSON</button>
-                <button class="btn btn-primary" onclick="importExcel()">📊 Nhập Excel</button>
+                <button class="btn btn-success" onclick="openAddModal()">âž• ThÃªm cÃ´ng viá»‡c</button>
+                <button class="btn btn-primary" onclick="exportData()">ðŸ’¾ Xuáº¥t dá»¯ liá»‡u</button>
+                <button class="btn btn-danger" onclick="importJSON()">ðŸ“¥ Nháº­p JSON</button>
+                <button class="btn btn-primary" onclick="importExcel()">ðŸ“Š Nháº­p Excel</button>
             </div>
             <div style="margin-top:15px;color:#666;font-size:14px;">
-                Cập nhật: <span id="lastUpdate"></span>
+                Cáº­p nháº­t: <span id="lastUpdate"></span>
             </div>
         </header>
 
         <div class="stats-grid">
             <div class="stat-card completed">
-                <div class="stat-icon">✅</div>
+                <div class="stat-icon">âœ…</div>
                 <div class="stat-value" id="completedTasks">0</div>
-                <div class="stat-label">Hoàn thành</div>
+                <div class="stat-label">HoÃ n thÃ nh</div>
             </div>
             <div class="stat-card progress">
-                <div class="stat-icon">⏳</div>
+                <div class="stat-icon">â³</div>
                 <div class="stat-value" id="inProgressTasks">0</div>
-                <div class="stat-label">Đang thực hiện</div>
+                <div class="stat-label">Äang thá»±c hiá»‡n</div>
             </div>
             <div class="stat-card pending">
-                <div class="stat-icon">📋</div>
+                <div class="stat-icon">ðŸ“‹</div>
                 <div class="stat-value" id="pendingTasks">0</div>
-                <div class="stat-label">Chưa bắt đầu</div>
+                <div class="stat-label">ChÆ°a báº¯t Ä‘áº§u</div>
             </div>
             <div class="stat-card overdue">
-                <div class="stat-icon">⚠️</div>
+                <div class="stat-icon">âš ï¸</div>
                 <div class="stat-value" id="overdueTasks">0</div>
-                <div class="stat-label">Quá hạn</div>
+                <div class="stat-label">QuÃ¡ háº¡n</div>
             </div>
         </div>
 
         <div class="view-tabs">
-            <button class="view-tab active" onclick="switchView('all')">📋 Tất cả</button>
-            <button class="view-tab" onclick="switchView('group')">📁 Theo nhóm việc</button>
-            <button class="view-tab" onclick="switchView('people')">👥 Theo người</button>
+            <button class="view-tab active" onclick="switchView('all')">ðŸ“‹ Táº¥t cáº£</button>
+            <button class="view-tab" onclick="switchView('group')">ðŸ“ Theo nhÃ³m viá»‡c</button>
+            <button class="view-tab" onclick="switchView('people')">ðŸ‘¥ Theo ngÆ°á»i</button>
         </div>
 
         <div id="groupSelectContainer" class="group-select-container" style="display:none;">
-            <div class="group-select-label">📁 Chọn nhóm việc:</div>
+            <div class="group-select-label">ðŸ“ Chá»n nhÃ³m viá»‡c:</div>
             <select id="groupSelect" class="group-select" onchange="switchGroup(this.value)"></select>
         </div>
 
         <div id="personSelectContainer" class="group-select-container" style="display:none;">
-            <div class="group-select-label">👤 Chọn người xem:</div>
+            <div class="group-select-label">ðŸ‘¤ Chá»n ngÆ°á»i xem:</div>
             <select id="personSelect" class="person-select" onchange="switchPerson(this.value)"></select>
         </div>
 
@@ -231,40 +231,40 @@
     <!-- Modal -->
     <div class="modal" id="taskModal">
         <div class="modal-content">
-            <div class="modal-header" id="modalTitle">Thêm công việc mới</div>
+            <div class="modal-header" id="modalTitle">ThÃªm cÃ´ng viá»‡c má»›i</div>
             <form id="taskForm" onsubmit="saveTask(event)">
                 <div class="form-grid">
                     <div class="form-group">
-                        <label>Nhóm việc *</label>
+                        <label>NhÃ³m viá»‡c *</label>
                         <input type="text" name="group" required placeholder="VD: Marketing Online">
                     </div>
                     <div class="form-group">
-                        <label>Chương trình *</label>
+                        <label>ChÆ°Æ¡ng trÃ¬nh *</label>
                         <input type="text" name="program" required placeholder="VD: Social Media">
                     </div>
                 </div>
                 
                 <div class="form-group full-width">
-                    <label>Công việc cụ thể *</label>
-                    <input type="text" name="title" required placeholder="VD: Đăng bài Facebook">
+                    <label>CÃ´ng viá»‡c cá»¥ thá»ƒ *</label>
+                    <input type="text" name="title" required placeholder="VD: ÄÄƒng bÃ i Facebook">
                 </div>
                 
                 <div class="form-group full-width">
-                    <label>Mô tả</label>
-                    <textarea name="description" placeholder="Mô tả chi tiết công việc..."></textarea>
+                    <label>MÃ´ táº£</label>
+                    <textarea name="description" placeholder="MÃ´ táº£ chi tiáº¿t cÃ´ng viá»‡c..."></textarea>
                 </div>
                 
                 <div class="form-grid">
                     <div class="form-group">
-                        <label>Người điều phối *</label>
+                        <label>NgÆ°á»i Ä‘iá»u phá»‘i *</label>
                         <input type="text" name="coordinator" required>
                     </div>
                     <div class="form-group">
-                        <label>Người thực hiện *</label>
+                        <label>NgÆ°á»i thá»±c hiá»‡n *</label>
                         <input type="text" name="assignee" required>
                     </div>
                     <div class="form-group">
-                        <label>Người duyệt *</label>
+                        <label>NgÆ°á»i duyá»‡t *</label>
                         <input type="text" name="approver" required>
                     </div>
                 </div>
@@ -275,39 +275,39 @@
                         <input type="date" name="deadline" required>
                     </div>
                     <div class="form-group">
-                        <label>Tần suất *</label>
+                        <label>Táº§n suáº¥t *</label>
                         <select name="frequency" required>
-                            <option value="Một lần">Một lần</option>
-                            <option value="Hàng ngày">Hàng ngày</option>
-                            <option value="Hàng tuần">Hàng tuần</option>
-                            <option value="Hàng tháng">Hàng tháng</option>
+                            <option value="Má»™t láº§n">Má»™t láº§n</option>
+                            <option value="HÃ ng ngÃ y">HÃ ng ngÃ y</option>
+                            <option value="HÃ ng tuáº§n">HÃ ng tuáº§n</option>
+                            <option value="HÃ ng thÃ¡ng">HÃ ng thÃ¡ng</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Trạng thái *</label>
+                        <label>Tráº¡ng thÃ¡i *</label>
                         <select name="status" required>
-                            <option value="pending">Chưa bắt đầu</option>
-                            <option value="inprogress">Đang thực hiện</option>
-                            <option value="completed">Hoàn thành</option>
-                            <option value="overdue">Quá hạn</option>
+                            <option value="pending">ChÆ°a báº¯t Ä‘áº§u</option>
+                            <option value="inprogress">Äang thá»±c hiá»‡n</option>
+                            <option value="completed">HoÃ n thÃ nh</option>
+                            <option value="overdue">QuÃ¡ háº¡n</option>
                         </select>
                     </div>
                 </div>
                 
                 <div class="form-group full-width">
-                    <label>Đầu ra bắt buộc *</label>
-                    <input type="text" name="requiredOutput" required placeholder="VD: 1 bài post + 3 ảnh">
+                    <label>Äáº§u ra báº¯t buá»™c *</label>
+                    <input type="text" name="requiredOutput" required placeholder="VD: 1 bÃ i post + 3 áº£nh">
                 </div>
                 
                 <div class="form-group">
-                    <label>Tiến độ (%) *</label>
+                    <label>Tiáº¿n Ä‘á»™ (%) *</label>
                     <input type="number" name="progress" min="0" max="100" value="0" required>
                 </div>
                 
                 <input type="hidden" name="id">
                 <div class="modal-actions">
-                    <button type="button" class="btn" onclick="closeModal()" style="background:#6b7280;color:white;">Hủy</button>
-                    <button type="submit" class="btn btn-success">Lưu</button>
+                    <button type="button" class="btn" onclick="closeModal()" style="background:#6b7280;color:white;">Há»§y</button>
+                    <button type="submit" class="btn btn-success">LÆ°u</button>
                 </div>
             </form>
         </div>
@@ -320,43 +320,43 @@
         let currentPerson = null;
         let editingId = null;
 
-        // Dữ liệu mẫu
+        // Dá»¯ liá»‡u máº«u
         const defaultData = [
             {
                 id: Date.now() + 1,
                 group: "Marketing Online",
                 program: "Social Media",
-                title: "Đăng bài Facebook",
-                coordinator: "Nguyễn Văn A",
-                assignee: "Trần Thị B",
-                approver: "Lê Văn C",
+                title: "ÄÄƒng bÃ i Facebook",
+                coordinator: "Nguyá»…n VÄƒn A",
+                assignee: "Tráº§n Thá»‹ B",
+                approver: "LÃª VÄƒn C",
                 deadline: "2026-01-15",
-                frequency: "Hàng ngày",
-                requiredOutput: "1 bài post + ảnh",
+                frequency: "HÃ ng ngÃ y",
+                requiredOutput: "1 bÃ i post + áº£nh",
                 status: "completed",
-                description: "Đăng bài quảng cáo sản phẩm",
+                description: "ÄÄƒng bÃ i quáº£ng cÃ¡o sáº£n pháº©m",
                 progress: 100,
                 lastRecurDate: "2026-01-15"
             },
             {
                 id: Date.now() + 2,
                 group: "Marketing Offline",
-                program: "Sự kiện",
-                title: "Chuẩn bị booth triển lãm",
-                coordinator: "Phạm Thị D",
-                assignee: "Nguyễn Văn A",
-                approver: "Hoàng Văn E",
+                program: "Sá»± kiá»‡n",
+                title: "Chuáº©n bá»‹ booth triá»ƒn lÃ£m",
+                coordinator: "Pháº¡m Thá»‹ D",
+                assignee: "Nguyá»…n VÄƒn A",
+                approver: "HoÃ ng VÄƒn E",
                 deadline: "2026-01-20",
-                frequency: "Một lần",
+                frequency: "Má»™t láº§n",
                 requiredOutput: "Booth + catalog",
                 status: "inprogress",
-                description: "Setup booth cho triển lãm",
+                description: "Setup booth cho triá»ƒn lÃ£m",
                 progress: 60,
                 lastRecurDate: null
             }
         ];
 
-        // Load dữ liệu
+        // Load dá»¯ liá»‡u
         function loadData() {
             const saved = localStorage.getItem('marketingTasksV2');
             if (saved) {
@@ -373,14 +373,14 @@
             localStorage.setItem('marketingTasksV2', JSON.stringify(tasksData));
         }
 
-        // Kiểm tra và tạo task lặp lại
+        // Kiá»ƒm tra vÃ  táº¡o task láº·p láº¡i
         function checkRecurringTasks() {
             const today = new Date().toISOString().split('T')[0];
             let updated = false;
 
             tasksData.forEach(task => {
-                if (task.frequency === 'Hàng ngày' && task.lastRecurDate !== today) {
-                    // Tạo task mới cho hôm nay
+                if (false && task.frequency === 'HÃ ng ngÃ y' && task.lastRecurDate !== today) {
+                    // Táº¡o task má»›i cho hÃ´m nay
                     const newTask = {
                         ...task,
                         id: Date.now() + Math.random(),
@@ -398,7 +398,7 @@
             if (updated) saveToStorage();
         }
 
-        // Kiểm tra quá hạn
+        // Kiá»ƒm tra quÃ¡ háº¡n
         function checkOverdueTasks() {
             const today = new Date();
             today.setHours(0, 0, 0, 0);
@@ -419,7 +419,7 @@
             if (updated) saveToStorage();
         }
 
-        // Cập nhật thống kê
+        // Cáº­p nháº­t thá»‘ng kÃª
         function updateStats() {
             checkRecurringTasks();
             checkOverdueTasks();
@@ -436,7 +436,7 @@
             document.getElementById('lastUpdate').textContent = new Date().toLocaleString('vi-VN');
         }
 
-        // Chuyển view
+        // Chuyá»ƒn view
         function switchView(view) {
             currentView = view;
             document.querySelectorAll('.view-tab').forEach(tab => tab.classList.remove('active'));
@@ -464,7 +464,7 @@
             select.innerHTML = groups.map((group, index) => {
                 const count = tasksData.filter(t => t.group === group).length;
                 const isSelected = (currentGroup === group) || (currentGroup === null && index === 0);
-                return `<option value="${group}" ${isSelected ? 'selected' : ''}>${group} (${count} công việc)</option>`;
+                return `<option value="${group}" ${isSelected ? 'selected' : ''}>${group} (${count} cÃ´ng viá»‡c)</option>`;
             }).join('');
             
             if (currentGroup === null && groups.length > 0) {
@@ -474,7 +474,7 @@
             switchGroup(currentGroup);
         }
 
-        // Chuyển nhóm
+        // Chuyá»ƒn nhÃ³m
         function switchGroup(group) {
             currentGroup = group;
             const filtered = tasksData.filter(t => t.group === group);
@@ -490,7 +490,7 @@
                 const count = tasksData.filter(t => t.assignee === person).length;
                 const isSelected = (currentPerson === person) || (currentPerson === null && index === 0);
                 const initial = person.charAt(0).toUpperCase();
-                return `<option value="${person}" ${isSelected ? 'selected' : ''}>${initial} ${person} (${count} công việc)</option>`;
+                return `<option value="${person}" ${isSelected ? 'selected' : ''}>${initial} ${person} (${count} cÃ´ng viá»‡c)</option>`;
             }).join('');
             
             if (currentPerson === null && people.length > 0) {
@@ -500,46 +500,46 @@
             switchPerson(currentPerson);
         }
 
-        // Chuyển người
+        // Chuyá»ƒn ngÆ°á»i
         function switchPerson(person) {
             currentPerson = person;
             const filtered = tasksData.filter(t => t.assignee === person);
             renderTasks(filtered);
         }
 
-        // Hiển thị tasks
+        // Hiá»ƒn thá»‹ tasks
         function renderTasks(tasks) {
             const container = document.getElementById('tasksContainer');
             
             if (tasks.length === 0) {
-                container.innerHTML = '<div style="text-align:center;padding:40px;color:white;font-size:18px;">Không có công việc nào</div>';
+                container.innerHTML = '<div style="text-align:center;padding:40px;color:white;font-size:18px;">KhÃ´ng cÃ³ cÃ´ng viá»‡c nÃ o</div>';
                 return;
             }
 
             container.innerHTML = tasks.map(task => `
                 <div class="task-card ${task.status}">
                     <div class="task-actions">
-                        <button class="task-action-btn edit" onclick="editTask(${task.id})">✏️ Sửa</button>
-                        <button class="task-action-btn delete" onclick="deleteTask(${task.id})">🗑️ Xóa</button>
+                        <button class="task-action-btn edit" onclick="editTask(${task.id})">âœï¸ Sá»­a</button>
+                        <button class="task-action-btn delete" onclick="deleteTask(${task.id})">ðŸ—‘ï¸ XÃ³a</button>
                     </div>
-                    <span class="task-status-badge ${task.status}" onclick="changeStatus(${task.id})" title="Click để đổi trạng thái">
+                    <span class="task-status-badge ${task.status}" onclick="changeStatus(${task.id})" title="Click Ä‘á»ƒ Ä‘á»•i tráº¡ng thÃ¡i">
                         ${getStatusText(task.status)}
                     </span>
-                    <div class="task-group">📁 ${task.group} » ${task.program}</div>
+                    <div class="task-group">ðŸ“ ${task.group} Â» ${task.program}</div>
                     <div class="task-header">
                         <div class="task-title">${task.title}</div>
                     </div>
                     <div class="task-info">${task.description || ''}</div>
                     <div class="task-meta">
-                        <div class="meta-item">📅 Deadline: ${formatDate(task.deadline)}</div>
-                        <div class="meta-item">🔄 Tần suất: ${task.frequency}</div>
-                        <div class="meta-item">👤 Thực hiện: ${task.assignee}</div>
-                        <div class="meta-item">📋 Điều phối: ${task.coordinator}</div>
-                        <div class="meta-item">✅ Duyệt: ${task.approver}</div>
-                        <div class="meta-item">📊 Tiến độ: ${task.progress}%</div>
+                        <div class="meta-item">ðŸ“… Deadline: ${formatDate(task.deadline)}</div>
+                        <div class="meta-item">ðŸ”„ Táº§n suáº¥t: ${task.frequency}</div>
+                        <div class="meta-item">ðŸ‘¤ Thá»±c hiá»‡n: ${task.assignee}</div>
+                        <div class="meta-item">ðŸ“‹ Äiá»u phá»‘i: ${task.coordinator}</div>
+                        <div class="meta-item">âœ… Duyá»‡t: ${task.approver}</div>
+                        <div class="meta-item">ðŸ“Š Tiáº¿n Ä‘á»™: ${task.progress}%</div>
                     </div>
                     <div style="margin-top:10px;padding:10px;background:#f0f9ff;border-radius:8px;">
-                        <strong style="color:#0369a1;">📦 Đầu ra:</strong> ${task.requiredOutput}
+                        <strong style="color:#0369a1;">ðŸ“¦ Äáº§u ra:</strong> ${task.requiredOutput}
                     </div>
                     ${task.status !== 'completed' && task.status !== 'pending' ? `
                     <div class="progress-bar">
@@ -550,21 +550,21 @@
             `).join('');
         }
 
-        // Mở modal thêm
+        // Má»Ÿ modal thÃªm
         function openAddModal() {
             editingId = null;
-            document.getElementById('modalTitle').textContent = 'Thêm công việc mới';
+            document.getElementById('modalTitle').textContent = 'ThÃªm cÃ´ng viá»‡c má»›i';
             document.getElementById('taskForm').reset();
             document.getElementById('taskModal').classList.add('active');
         }
 
-        // Sửa task
+        // Sá»­a task
         function editTask(id) {
             const task = tasksData.find(t => t.id === id);
             if (!task) return;
 
             editingId = id;
-            document.getElementById('modalTitle').textContent = 'Sửa công việc';
+            document.getElementById('modalTitle').textContent = 'Sá»­a cÃ´ng viá»‡c';
             const form = document.getElementById('taskForm');
             
             form.group.value = task.group;
@@ -584,9 +584,9 @@
             document.getElementById('taskModal').classList.add('active');
         }
 
-        // Xóa task
+        // XÃ³a task
         function deleteTask(id) {
-            if (confirm('Bạn có chắc muốn xóa công việc này?')) {
+            if (confirm('Báº¡n cÃ³ cháº¯c muá»‘n xÃ³a cÃ´ng viá»‡c nÃ y?')) {
                 tasksData = tasksData.filter(t => t.id !== id);
                 saveToStorage();
                 updateStats();
@@ -594,7 +594,7 @@
             }
         }
 
-        // Lưu task
+        // LÆ°u task
         function saveTask(e) {
             e.preventDefault();
             const form = e.target;
@@ -614,7 +614,7 @@
                 requiredOutput: formData.get('requiredOutput'),
                 status: formData.get('status'),
                 progress: parseInt(formData.get('progress')),
-                lastRecurDate: formData.get('frequency') === 'Hàng ngày' ? new Date().toISOString().split('T')[0] : null
+                lastRecurDate: formData.get('frequency') === 'HÃ ng ngÃ y' ? new Date().toISOString().split('T')[0] : null
             };
 
             if (editingId) {
@@ -630,7 +630,7 @@
             switchView(currentView);
         }
 
-        // Đổi trạng thái
+        // Äá»•i tráº¡ng thÃ¡i
         function changeStatus(id) {
             const task = tasksData.find(t => t.id === id);
             if (!task) return;
@@ -660,10 +660,10 @@
 
         function getStatusText(status) {
             const statusMap = {
-                'completed': 'Hoàn thành',
-                'inprogress': 'Đang thực hiện',
-                'pending': 'Chưa bắt đầu',
-                'overdue': 'Quá hạn'
+                'completed': 'HoÃ n thÃ nh',
+                'inprogress': 'Äang thá»±c hiá»‡n',
+                'pending': 'ChÆ°a báº¯t Ä‘áº§u',
+                'overdue': 'QuÃ¡ háº¡n'
             };
             return statusMap[status] || status;
         }
@@ -695,15 +695,15 @@
                 reader.onload = event => {
                     try {
                         const data = JSON.parse(event.target.result);
-                        if (confirm('Nhập dữ liệu sẽ ghi đè dữ liệu hiện tại. Tiếp tục?')) {
+                        if (confirm('Nháº­p dá»¯ liá»‡u sáº½ ghi Ä‘Ã¨ dá»¯ liá»‡u hiá»‡n táº¡i. Tiáº¿p tá»¥c?')) {
                             tasksData = data;
                             saveToStorage();
                             updateStats();
                             switchView('all');
-                            alert('Nhập dữ liệu thành công!');
+                            alert('Nháº­p dá»¯ liá»‡u thÃ nh cÃ´ng!');
                         }
                     } catch (err) {
-                        alert('File không đúng định dạng!');
+                        alert('File khÃ´ng Ä‘Ãºng Ä‘á»‹nh dáº¡ng!');
                     }
                 };
                 reader.readAsText(file);
@@ -727,7 +727,7 @@
                         const rows = XLSX.utils.sheet_to_json(firstSheet);
                         
                         if (rows.length === 0) {
-                            alert('File Excel không có dữ liệu!');
+                            alert('File Excel khÃ´ng cÃ³ dá»¯ liá»‡u!');
                             return;
                         }
                         
@@ -735,17 +735,17 @@
                             let status = 'pending';
                             let progress = 0;
                             
-                            const statusText = (row['Trạng thái'] || row['Status'] || '').toString().toLowerCase();
-                            if (statusText.includes('hoàn thành') || statusText.includes('completed')) {
+                            const statusText = (row['Tráº¡ng thÃ¡i'] || row['Status'] || '').toString().toLowerCase();
+                            if (statusText.includes('hoÃ n thÃ nh') || statusText.includes('completed')) {
                                 status = 'completed';
                                 progress = 100;
-                            } else if (statusText.includes('đang') || statusText.includes('progress')) {
+                            } else if (statusText.includes('Ä‘ang') || statusText.includes('progress')) {
                                 status = 'inprogress';
-                                progress = parseInt(row['Tiến độ %'] || 50);
+                                progress = parseInt(row['Tiáº¿n Ä‘á»™ %'] || 50);
                             }
                             
                             let deadline = '';
-                            const deadlineValue = row['Deadline'] || row['Ngày deadline'] || '';
+                            const deadlineValue = row['Deadline'] || row['NgÃ y deadline'] || '';
                             if (deadlineValue) {
                                 if (typeof deadlineValue === 'number') {
                                     const date = XLSX.SSF.parse_date_code(deadlineValue);
@@ -757,32 +757,32 @@
                             
                             return {
                                 id: Date.now() + index,
-                                group: row['Nhóm việc'] || row['Group'] || 'Chưa phân nhóm',
-                                program: row['Chương trình'] || row['Program'] || '',
-                                title: row['Công việc cụ thể'] || row['Task'] || 'Công việc ' + (index + 1),
-                                description: row['Mô tả'] || row['Description'] || '',
-                                coordinator: row['Người điều phối'] || row['Coordinator'] || '',
-                                assignee: row['Người thực hiện'] || row['Assignee'] || 'Chưa phân công',
-                                approver: row['Người duyệt'] || row['Approver'] || '',
+                                group: row['NhÃ³m viá»‡c'] || row['Group'] || 'ChÆ°a phÃ¢n nhÃ³m',
+                                program: row['ChÆ°Æ¡ng trÃ¬nh'] || row['Program'] || '',
+                                title: row['CÃ´ng viá»‡c cá»¥ thá»ƒ'] || row['Task'] || 'CÃ´ng viá»‡c ' + (index + 1),
+                                description: row['MÃ´ táº£'] || row['Description'] || '',
+                                coordinator: row['NgÆ°á»i Ä‘iá»u phá»‘i'] || row['Coordinator'] || '',
+                                assignee: row['NgÆ°á»i thá»±c hiá»‡n'] || row['Assignee'] || 'ChÆ°a phÃ¢n cÃ´ng',
+                                approver: row['NgÆ°á»i duyá»‡t'] || row['Approver'] || '',
                                 deadline: deadline || new Date().toISOString().split('T')[0],
-                                frequency: row['Tần suất'] || row['Frequency'] || 'Một lần',
-                                requiredOutput: row['Đầu ra bắt buộc'] || row['Required Output'] || '',
+                                frequency: row['Táº§n suáº¥t'] || row['Frequency'] || 'Má»™t láº§n',
+                                requiredOutput: row['Äáº§u ra báº¯t buá»™c'] || row['Required Output'] || '',
                                 status: status,
                                 progress: progress,
                                 lastRecurDate: null
                             };
                         });
                         
-                        if (confirm(`Tìm thấy ${convertedData.length} công việc. Nhập dữ liệu sẽ ghi đè dữ liệu hiện tại. Tiếp tục?`)) {
+                        if (confirm(`TÃ¬m tháº¥y ${convertedData.length} cÃ´ng viá»‡c. Nháº­p dá»¯ liá»‡u sáº½ ghi Ä‘Ã¨ dá»¯ liá»‡u hiá»‡n táº¡i. Tiáº¿p tá»¥c?`)) {
                             tasksData = convertedData;
                             saveToStorage();
                             updateStats();
                             switchView('all');
-                            alert('Nhập Excel thành công!');
+                            alert('Nháº­p Excel thÃ nh cÃ´ng!');
                         }
                     } catch (err) {
                         console.error(err);
-                        alert('Lỗi khi đọc file Excel: ' + err.message);
+                        alert('Lá»—i khi Ä‘á»c file Excel: ' + err.message);
                     }
                 };
                 reader.readAsArrayBuffer(file);
@@ -790,12 +790,12 @@
             input.click();
         }
 
-        // Đóng modal khi click ngoài
+        // ÄÃ³ng modal khi click ngoÃ i
         document.getElementById('taskModal').addEventListener('click', (e) => {
             if (e.target.id === 'taskModal') closeModal();
         });
 
-        // Khởi tạo
+        // Khá»Ÿi táº¡o
         loadData();
         updateStats();
         renderTasks(tasksData);
