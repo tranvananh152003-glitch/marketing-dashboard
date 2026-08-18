@@ -10,12 +10,17 @@
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
             background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh; padding: 20px;
+            min-height: 100vh;
+            padding: 20px;
         }
         .container { max-width: 1400px; margin: 0 auto; }
         header {
-            background: white; padding: 30px; border-radius: 15px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.1); margin-bottom: 30px; text-align: center;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.1);
+            margin-bottom: 30px;
+            text-align: center;
         }
         header h1 { color: #333; font-size: 28px; margin-bottom: 10px; }
         .header-actions { display: flex; gap: 10px; justify-content: center; margin-top: 15px; flex-wrap: wrap; }
@@ -29,8 +34,10 @@
         .btn:hover { transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.2); }
         
         .stats-grid {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 20px; margin-bottom: 30px;
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
         }
         .stat-card {
             background: white; padding: 25px; border-radius: 15px;
@@ -57,31 +64,55 @@
         .view-tab.active { background: white; color: #667eea; }
         
         .tabs-container {
-            display: flex; gap: 10px; flex-wrap: wrap; padding: 15px;
-            background: white; border-radius: 15px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.1); margin-bottom: 20px;
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+            padding: 15px;
+            background: white;
+            border-radius: 15px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
         }
         
         .tab-item {
-            padding: 12px 20px; border: 2px solid #e5e7eb; border-radius: 10px;
-            background: white; color: #333; cursor: pointer;
-            font-size: 14px; font-weight: 500; transition: all 0.3s;
-            display: flex; align-items: center; gap: 8px;
+            padding: 12px 20px;
+            border: 2px solid #e5e7eb;
+            border-radius: 10px;
+            background: white;
+            color: #333;
+            cursor: pointer;
+            font-size: 14px;
+            font-weight: 500;
+            transition: all 0.3s;
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
+        
         .tab-item:hover {
-            border-color: #667eea; transform: translateY(-2px);
+            border-color: #667eea;
+            transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
         }
+        
         .tab-item.active {
-            background: #667eea; color: white; border-color: #667eea;
+            background: #667eea;
+            color: white;
+            border-color: #667eea;
         }
+        
         .tab-count {
-            background: rgba(102, 126, 234, 0.1); color: #667eea;
-            padding: 3px 10px; border-radius: 12px;
-            font-size: 12px; font-weight: 600;
+            background: rgba(102, 126, 234, 0.1);
+            color: #667eea;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 600;
         }
+        
         .tab-item.active .tab-count {
-            background: rgba(255, 255, 255, 0.3); color: white;
+            background: rgba(255, 255, 255, 0.3);
+            color: white;
         }
         
         .tasks-container { display: grid; gap: 15px; }
@@ -106,7 +137,8 @@
         .bulk-count { font-weight: 600; color: #333; }
         .bulk-btn {
             padding: 8px 16px; border: none; border-radius: 8px;
-            cursor: pointer; font-size: 13px; font-weight: 500; transition: all 0.2s;
+            cursor: pointer; font-size: 13px; font-weight: 500;
+            transition: all 0.2s;
         }
         .bulk-btn:hover { transform: translateY(-2px); }
         .bulk-btn.complete { background: #10b981; color: white; }
@@ -118,38 +150,67 @@
             width: 20px; height: 20px; cursor: pointer;
             margin-right: 10px; transform: scale(1.2);
         }
-        .selection-area { display: none; align-items: center; }
-        .selection-area.show { display: flex; }
+        
+        .selection-area {
+            display: none;
+            align-items: center;
+        }
+        .selection-area.show {
+            display: flex;
+        }
         
         .submission-section {
-            margin-top: 15px; padding: 12px;
-            background: #f0fdf4; border-radius: 8px;
+            margin-top: 15px;
+            padding: 12px;
+            background: #f0fdf4;
+            border-radius: 8px;
             border-left: 3px solid #10b981;
         }
+        
         .submission-label {
-            font-size: 13px; color: #065f46;
-            font-weight: 600; margin-bottom: 8px;
+            font-size: 13px;
+            color: #065f46;
+            font-weight: 600;
+            margin-bottom: 8px;
         }
+        
         .submission-content {
-            display: flex; gap: 8px; flex-wrap: wrap; align-items: center;
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            align-items: center;
         }
+        
         .submission-link {
-            font-size: 12px; color: #0891b2; word-break: break-all;
+            font-size: 12px;
+            color: #0891b2;
+            word-break: break-all;
         }
+        
         .submit-btn {
-            padding: 8px 16px; background: #10b981; color: white;
-            border: none; border-radius: 8px; cursor: pointer;
-            font-size: 13px; font-weight: 500; transition: all 0.2s;
+            padding: 8px 16px;
+            background: #10b981;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 13px;
+            font-weight: 500;
+            transition: all 0.2s;
         }
+        
         .submit-btn:hover {
-            background: #059669; transform: translateY(-2px);
+            background: #059669;
+            transform: translateY(-2px);
         }
         
         .task-actions {
-            display: flex; gap: 8px; margin-bottom: 10px;
-            justify-content: space-between; align-items: center;
+            display: flex; gap: 8px; margin-bottom: 10px; justify-content: space-between;
+            align-items: center;
         }
-        .task-action-btns { display: flex; gap: 8px; }
+        .task-action-btns {
+            display: flex; gap: 8px;
+        }
         .task-action-btn {
             padding: 5px 10px; border: none; border-radius: 5px;
             cursor: pointer; font-size: 12px; transition: all 0.2s;
@@ -288,15 +349,11 @@
 
     <div class="modal" id="submitModal">
         <div class="modal-content">
-            <div class="modal-header">📤 Link nộp bài</div>
+            <div class="modal-header">📤 Nộp bài</div>
             <form id="submitForm" onsubmit="saveSubmission(event)">
                 <div class="form-group">
-                    <label>Link nộp bài (Google Drive, Figma...)</label>
+                    <label>Link nộp bài</label>
                     <input type="url" name="submissionLink" placeholder="https://...">
-                </div>
-                <div class="form-group">
-                    <label>Hoặc đẩy file</label>
-                    <input type="file" name="submissionFile" id="submissionFile" accept="*/*">
                 </div>
                 <div class="form-group">
                     <label>Ghi chú</label>
@@ -345,8 +402,8 @@
                         <input type="text" name="coordinator" required>
                     </div>
                     <div class="form-group">
-                        <label>Người thực hiện * (phân cách bằng dấu phẩy)</label>
-                        <input type="text" name="assignee" required placeholder="VD: Nguyễn A, Trần B">
+                        <label>Người thực hiện *</label>
+                        <input type="text" name="assignee" required>
                     </div>
                     <div class="form-group">
                         <label>Người duyệt *</label>
@@ -394,3 +451,581 @@
     </div>
 
     <script>
+        let tasksData = [];
+        let currentView = 'all';
+        let currentGroup = null;
+        let currentPerson = null;
+        let editingId = null;
+        let selectedTasks = new Set();
+        let selectionMode = false;
+
+        const defaultData = [
+            {
+                id: Date.now() + 1,
+                group: "Marketing Online",
+                program: "Social Media",
+                title: "Đăng bài Facebook",
+                coordinator: "Nguyễn Văn A",
+                assignee: "Trần Thị B",
+                approver: "Lê Văn C",
+                deadline: "2026-01-15",
+                frequency: "Hàng ngày",
+                requiredOutput: "1 bài post + ảnh",
+                status: "completed",
+                description: "Đăng bài quảng cáo sản phẩm",
+                progress: 100,
+                lastRecurDate: "2026-01-15",
+                submissionLink: "",
+                submissionNote: ""
+            }
+        ];
+
+        function loadData() {
+            const saved = localStorage.getItem('marketingTasksV2');
+            if (saved) {
+                tasksData = JSON.parse(saved);
+                checkRecurringTasks();
+                checkOverdueTasks();
+            } else {
+                tasksData = defaultData;
+                saveToStorage();
+            }
+        }
+
+        function saveToStorage() {
+            localStorage.setItem('marketingTasksV2', JSON.stringify(tasksData));
+        }
+
+        function checkRecurringTasks() {
+            const today = new Date().toISOString().split('T')[0];
+            let updated = false;
+            tasksData.forEach(task => {
+                if (task.frequency === 'Hàng ngày' && task.lastRecurDate !== today) {
+                    const newTask = {...task, id: Date.now() + Math.random(), status: 'pending', progress: 0, deadline: today, lastRecurDate: today, submissionLink: '', submissionNote: ''};
+                    tasksData.push(newTask);
+                    task.lastRecurDate = today;
+                    updated = true;
+                }
+            });
+            if (updated) saveToStorage();
+        }
+
+        function checkOverdueTasks() {
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            let updated = false;
+            tasksData.forEach(task => {
+                if (task.status !== 'completed') {
+                    const deadline = new Date(task.deadline);
+                    deadline.setHours(0, 0, 0, 0);
+                    if (deadline < today) {
+                        task.status = 'overdue';
+                        updated = true;
+                    }
+                }
+            });
+            if (updated) saveToStorage();
+        }
+
+        function updateStats() {
+            checkRecurringTasks();
+            checkOverdueTasks();
+            const completed = tasksData.filter(t => t.status === 'completed').length;
+            const inProgress = tasksData.filter(t => t.status === 'inprogress').length;
+            const pending = tasksData.filter(t => t.status === 'pending').length;
+            const overdue = tasksData.filter(t => t.status === 'overdue').length;
+            document.getElementById('completedTasks').textContent = completed;
+            document.getElementById('inProgressTasks').textContent = inProgress;
+            document.getElementById('pendingTasks').textContent = pending;
+            document.getElementById('overdueTasks').textContent = overdue;
+            document.getElementById('lastUpdate').textContent = new Date().toLocaleString('vi-VN');
+        }
+
+        function switchGroup(group) {
+            currentGroup = group;
+            document.querySelectorAll('.tab-item').forEach(tab => tab.classList.remove('active'));
+            event.target.closest('.tab-item').classList.add('active');
+            const filtered = tasksData.filter(t => t.group === group);
+            renderTasks(filtered);
+        }
+
+        function switchPerson(person) {
+            currentPerson = person;
+            document.querySelectorAll('.tab-item').forEach(tab => tab.classList.remove('active'));
+            event.target.closest('.tab-item').classList.add('active');
+            const filtered = tasksData.filter(t => t.assignee === person);
+            renderTasks(filtered);
+        }
+
+        function toggleSelectionMode() {
+            selectionMode = !selectionMode;
+            const btn = document.getElementById('selectModeBtn');
+            if (selectionMode) {
+                btn.textContent = '✕ Hủy chọn';
+                btn.style.background = '#6b7280';
+                updateBulkActionsBar();
+            } else {
+                btn.textContent = '☑️ Chọn nhiều';
+                btn.style.background = '#667eea';
+                selectedTasks.clear();
+                document.getElementById('bulkActionsBar').classList.remove('show');
+            }
+            switchView(currentView);
+        }
+
+        function exitSelectionMode() {
+            selectionMode = false;
+            selectedTasks.clear();
+            const btn = document.getElementById('selectModeBtn');
+            btn.textContent = '☑️ Chọn nhiều';
+            btn.style.background = '#667eea';
+            document.getElementById('bulkActionsBar').classList.remove('show');
+            switchView(currentView);
+        }
+
+        function selectAll() {
+            let displayedTasks = [];
+            if (currentView === 'all') {
+                displayedTasks = tasksData;
+            } else if (currentView === 'group' && currentGroup) {
+                displayedTasks = tasksData.filter(t => t.group === currentGroup);
+            } else if (currentView === 'people' && currentPerson) {
+                displayedTasks = tasksData.filter(t => t.assignee === currentPerson);
+            }
+            displayedTasks.forEach(task => selectedTasks.add(task.id));
+            document.querySelectorAll('.task-checkbox').forEach(checkbox => checkbox.checked = true);
+            updateBulkActionsBar();
+        }
+
+        function toggleTask(id) {
+            if (selectedTasks.has(id)) {
+                selectedTasks.delete(id);
+            } else {
+                selectedTasks.add(id);
+            }
+            updateBulkActionsBar();
+        }
+
+        function updateBulkActionsBar() {
+            if (!selectionMode) return;
+            const bar = document.getElementById('bulkActionsBar');
+            const count = document.getElementById('selectedCount');
+            bar.classList.add('show');
+            count.textContent = selectedTasks.size;
+        }
+
+        function bulkComplete() {
+            if (selectedTasks.size === 0) {
+                alert('Chưa chọn công việc nào!');
+                return;
+            }
+            if (confirm(`Đánh dấu hoàn thành ${selectedTasks.size} công việc?`)) {
+                selectedTasks.forEach(id => {
+                    const task = tasksData.find(t => t.id === id);
+                    if (task) {
+                        task.status = 'completed';
+                        task.progress = 100;
+                    }
+                });
+                saveToStorage();
+                updateStats();
+                exitSelectionMode();
+            }
+        }
+
+        function bulkDelete() {
+            if (selectedTasks.size === 0) {
+                alert('Chưa chọn công việc nào!');
+                return;
+            }
+            if (confirm(`Xóa ${selectedTasks.size} công việc? Không thể hoàn tác!`)) {
+                const selectedIds = Array.from(selectedTasks);
+                tasksData = tasksData.filter(t => !selectedIds.includes(t.id));
+                saveToStorage();
+                updateStats();
+                exitSelectionMode();
+            }
+        }
+
+        function switchView(view) {
+            currentView = view;
+            document.querySelectorAll('.view-tab').forEach(tab => tab.classList.remove('active'));
+            if (event && event.target) event.target.classList.add('active');
+            document.getElementById('groupTabs').style.display = 'none';
+            document.getElementById('personTabs').style.display = 'none';
+            if (view === 'all') {
+                renderTasks(tasksData);
+            } else if (view === 'group') {
+                document.getElementById('groupTabs').style.display = 'flex';
+                renderGroupTabs();
+            } else if (view === 'people') {
+                document.getElementById('personTabs').style.display = 'flex';
+                renderPersonTabs();
+            }
+        }
+
+        function renderGroupTabs() {
+            const groupsMap = {};
+            tasksData.forEach(task => {
+                if (!groupsMap[task.group]) groupsMap[task.group] = 0;
+                groupsMap[task.group]++;
+            });
+            const groups = Object.keys(groupsMap).sort();
+            const container = document.getElementById('groupTabs');
+            if (groups.length === 0) {
+                container.innerHTML = '<div style="padding:20px;color:#666;">Chưa có nhóm việc nào</div>';
+                return;
+            }
+            container.innerHTML = groups.map((group, index) => {
+                const count = groupsMap[group];
+                const isActive = (currentGroup === group) || (currentGroup === null && index === 0);
+                return `<button class="tab-item ${isActive ? 'active' : ''}" onclick="switchGroup('${group.replace(/'/g, "\\'")}')"><span>${group}</span><span class="tab-count">${count}</span></button>`;
+            }).join('');
+            if (currentGroup === null && groups.length > 0) currentGroup = groups[0];
+            switchGroup(currentGroup);
+        }
+
+        function renderPersonTabs() {
+            const peopleMap = {};
+            tasksData.forEach(task => {
+                if (!peopleMap[task.assignee]) peopleMap[task.assignee] = 0;
+                peopleMap[task.assignee]++;
+            });
+            const people = Object.keys(peopleMap).sort();
+            const container = document.getElementById('personTabs');
+            if (people.length === 0) {
+                container.innerHTML = '<div style="padding:20px;color:#666;">Chưa có người thực hiện nào</div>';
+                return;
+            }
+            container.innerHTML = people.map((person, index) => {
+                const count = peopleMap[person];
+                const isActive = (currentPerson === person) || (currentPerson === null && index === 0);
+                return `<button class="tab-item ${isActive ? 'active' : ''}" onclick="switchPerson('${person.replace(/'/g, "\\'")}')"><span>${person}</span><span class="tab-count">${count}</span></button>`;
+            }).join('');
+            if (currentPerson === null && people.length > 0) currentPerson = people[0];
+            switchPerson(currentPerson);
+        }
+
+        function renderTasks(tasks) {
+            const container = document.getElementById('tasksContainer');
+            if (tasks.length === 0) {
+                container.innerHTML = '<div style="text-align:center;padding:40px;color:white;font-size:18px;">Không có công việc nào</div>';
+                return;
+            }
+            container.innerHTML = tasks.map(task => `
+                <div class="task-card ${task.status}">
+                    <div class="task-actions">
+                        <div class="selection-area ${selectionMode ? 'show' : ''}">
+                            <input type="checkbox" class="task-checkbox" id="check-${task.id}" onchange="toggleTask(${task.id})" ${selectedTasks.has(task.id) ? 'checked' : ''}>
+                            <label for="check-${task.id}" style="cursor:pointer;">Chọn</label>
+                        </div>
+                        <div class="task-action-btns">
+                            <button class="task-action-btn edit" onclick="editTask(${task.id})">✏️ Sửa</button>
+                            <button class="task-action-btn delete" onclick="deleteTask(${task.id})">🗑️ Xóa</button>
+                        </div>
+                    </div>
+                    <span class="task-status-badge ${task.status}" onclick="changeStatus(${task.id})" title="Click để đổi trạng thái">${getStatusText(task.status)}</span>
+                    <div class="task-group">📁 ${task.group} » ${task.program}</div>
+                    <div class="task-header"><div class="task-title">${task.title}</div></div>
+                    <div class="task-info">${task.description || ''}</div>
+                    <div class="task-meta">
+                        <div class="meta-item">📅 ${formatDate(task.deadline)}</div>
+                        <div class="meta-item">🔄 ${task.frequency}</div>
+                        <div class="meta-item">👤 ${task.assignee}</div>
+                        <div class="meta-item">📋 ${task.coordinator}</div>
+                        <div class="meta-item">✅ ${task.approver}</div>
+                        <div class="meta-item">📊 ${task.progress}%</div>
+                    </div>
+                    <div style="margin-top:10px;padding:10px;background:#f0f9ff;border-radius:8px;"><strong style="color:#0369a1;">📦 Đầu ra:</strong> ${task.requiredOutput}</div>
+                    ${task.submissionLink || task.submissionNote ? `
+                    <div class="submission-section">
+                        <div class="submission-label">📎 Đã nộp:</div>
+                        <div class="submission-content">
+                            ${task.submissionLink ? `<a href="${task.submissionLink}" target="_blank" class="submission-link" onclick="event.stopPropagation()">🔗 ${task.submissionLink}</a>` : ''}
+                            ${task.submissionNote ? `<span class="submission-file">📄 ${task.submissionNote}</span>` : ''}
+                        </div>
+                    </div>
+                    ` : task.status !== 'completed' ? `<div style="margin-top:10px;"><button class="submit-btn" onclick="openSubmitModal(${task.id})">📤 Nộp bài</button></div>` : ''}
+                    ${task.status !== 'completed' && task.status !== 'pending' ? `<div class="progress-bar"><div class="progress-fill" style="width:${task.progress}%"></div></div>` : ''}
+                </div>
+            `).join('');
+        }
+
+        function openSubmitModal(id) {
+            const task = tasksData.find(t => t.id === id);
+            if (!task) return;
+            const form = document.getElementById('submitForm');
+            form.submissionLink.value = task.submissionLink || '';
+            form.submissionNote.value = task.submissionNote || '';
+            form.taskId.value = id;
+            document.getElementById('markCompleteCheck').checked = false;
+            document.getElementById('submitModal').classList.add('active');
+        }
+
+        function closeSubmitModal() {
+            document.getElementById('submitModal').classList.remove('active');
+        }
+
+        function saveSubmission(e) {
+            e.preventDefault();
+            const form = e.target;
+            const formData = new FormData(form);
+            const taskId = parseInt(formData.get('taskId'));
+            const task = tasksData.find(t => t.id === taskId);
+            if (!task) return;
+            task.submissionLink = formData.get('submissionLink') || '';
+            task.submissionNote = formData.get('submissionNote') || '';
+            if (document.getElementById('markCompleteCheck').checked) {
+                task.status = 'completed';
+                task.progress = 100;
+            }
+            saveToStorage();
+            closeSubmitModal();
+            updateStats();
+            switchView(currentView);
+            alert(task.status === 'completed' ? 'Đã nộp bài và hoàn thành! ✅' : 'Đã nộp bài! 📤');
+        }
+
+        function openAddModal() {
+            editingId = null;
+            document.getElementById('modalTitle').textContent = 'Thêm công việc mới';
+            document.getElementById('taskForm').reset();
+            document.getElementById('taskModal').classList.add('active');
+        }
+
+        function editTask(id) {
+            const task = tasksData.find(t => t.id === id);
+            if (!task) return;
+            editingId = id;
+            document.getElementById('modalTitle').textContent = 'Sửa công việc';
+            const form = document.getElementById('taskForm');
+            form.group.value = task.group;
+            form.program.value = task.program;
+            form.title.value = task.title;
+            form.description.value = task.description || '';
+            form.coordinator.value = task.coordinator;
+            form.assignee.value = task.assignee;
+            form.approver.value = task.approver;
+            form.deadline.value = task.deadline;
+            form.frequency.value = task.frequency;
+            form.requiredOutput.value = task.requiredOutput;
+            form.status.value = task.status;
+            form.progress.value = task.progress;
+            form.id.value = id;
+            document.getElementById('taskModal').classList.add('active');
+        }
+
+        function deleteTask(id) {
+            if (confirm('Xóa công việc này?')) {
+                tasksData = tasksData.filter(t => t.id !== id);
+                saveToStorage();
+                updateStats();
+                switchView(currentView);
+            }
+        }
+
+        function saveTask(e) {
+            e.preventDefault();
+            const form = e.target;
+            const formData = new FormData(form);
+            const task = {
+                id: editingId || Date.now(),
+                group: formData.get('group'),
+                program: formData.get('program'),
+                title: formData.get('title'),
+                description: formData.get('description'),
+                coordinator: formData.get('coordinator'),
+                assignee: formData.get('assignee'),
+                approver: formData.get('approver'),
+                deadline: formData.get('deadline'),
+                frequency: formData.get('frequency'),
+                requiredOutput: formData.get('requiredOutput'),
+                status: formData.get('status'),
+                progress: parseInt(formData.get('progress')),
+                submissionLink: '',
+                submissionNote: '',
+                lastRecurDate: formData.get('frequency') === 'Hàng ngày' ? new Date().toISOString().split('T')[0] : null
+            };
+            if (editingId) {
+                const index = tasksData.findIndex(t => t.id === editingId);
+                tasksData[index] = task;
+            } else {
+                tasksData.push(task);
+            }
+            saveToStorage();
+            closeModal();
+            updateStats();
+            switchView(currentView);
+        }
+
+        function changeStatus(id) {
+            const task = tasksData.find(t => t.id === id);
+            if (!task) return;
+            if (task.status === 'pending') {
+                task.status = 'inprogress';
+                task.progress = 50;
+            } else if (task.status === 'inprogress') {
+                task.status = 'completed';
+                task.progress = 100;
+            } else if (task.status === 'completed') {
+                task.status = 'pending';
+                task.progress = 0;
+            } else if (task.status === 'overdue') {
+                task.status = 'inprogress';
+                task.progress = 50;
+            }
+            saveToStorage();
+            updateStats();
+            switchView(currentView);
+        }
+
+        function closeModal() {
+            document.getElementById('taskModal').classList.remove('active');
+        }
+
+        function getStatusText(status) {
+            const statusMap = {'completed': 'Hoàn thành', 'inprogress': 'Đang thực hiện', 'pending': 'Chưa bắt đầu', 'overdue': 'Quá hạn'};
+            return statusMap[status] || status;
+        }
+
+        function formatDate(dateString) {
+            return new Date(dateString).toLocaleDateString('vi-VN');
+        }
+
+        function exportData() {
+            const dataStr = JSON.stringify(tasksData, null, 2);
+            const blob = new Blob([dataStr], { type: 'application/json' });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'marketing-tasks-' + new Date().toISOString().split('T')[0] + '.json';
+            a.click();
+        }
+
+        function importJSON() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.json';
+            input.onchange = e => {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                reader.onload = event => {
+                    try {
+                        const data = JSON.parse(event.target.result);
+                        if (confirm('Nhập dữ liệu sẽ ghi đè dữ liệu hiện tại. Tiếp tục?')) {
+                            tasksData = data;
+                            saveToStorage();
+                            updateStats();
+                            switchView('all');
+                            alert('Nhập thành công!');
+                        }
+                    } catch (err) {
+                        alert('File không đúng định dạng!');
+                    }
+                };
+                reader.readAsText(file);
+            };
+            input.click();
+        }
+
+        function importExcel() {
+            const input = document.createElement('input');
+            input.type = 'file';
+            input.accept = '.xlsx,.xls';
+            input.onchange = e => {
+                const file = e.target.files[0];
+                const reader = new FileReader();
+                reader.onload = event => {
+                    try {
+                        const data = new Uint8Array(event.target.result);
+                        const workbook = XLSX.read(data, { type: 'array' });
+                        const firstSheet = workbook.Sheets[workbook.SheetNames[0]];
+                        const rows = XLSX.utils.sheet_to_json(firstSheet);
+                        if (rows.length === 0) {
+                            alert('File Excel không có dữ liệu!');
+                            return;
+                        }
+                        const convertedData = rows.map((row, index) => {
+                            let status = 'pending';
+                            let progress = 0;
+                            const statusText = (row['Trạng thái'] || row['Status'] || '').toString().toLowerCase();
+                            if (statusText.includes('hoàn thành') || statusText.includes('completed')) {
+                                status = 'completed';
+                                progress = 100;
+                            } else if (statusText.includes('đang') || statusText.includes('progress')) {
+                                status = 'inprogress';
+                                progress = parseInt(row['Tiến độ %'] || row['Progress'] || 50);
+                            }
+                            let deadline = '';
+                            const deadlineValue = row['Deadline'] || row['Ngày deadline'] || row['Hạn chót'] || '';
+                            if (deadlineValue) {
+                                try {
+                                    if (typeof deadlineValue === 'number') {
+                                        const excelEpoch = new Date(1899, 11, 30);
+                                        const date = new Date(excelEpoch.getTime() + deadlineValue * 86400000);
+                                        deadline = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`;
+                                    } else if (deadlineValue instanceof Date) {
+                                        deadline = `${deadlineValue.getFullYear()}-${String(deadlineValue.getMonth() + 1).padStart(2, '0')}-${String(deadlineValue.getDate()).padStart(2, '0')}`;
+                                    } else {
+                                        const str = deadlineValue.toString();
+                                        if (str.includes('/')) {
+                                            const parts = str.split('/');
+                                            if (parts.length === 3) deadline = `${parts[2]}-${parts[1].padStart(2, '0')}-${parts[0].padStart(2, '0')}`;
+                                        } else if (str.includes('-')) {
+                                            deadline = str.split('T')[0];
+                                        }
+                                    }
+                                } catch (e) {
+                                    console.warn('Lỗi deadline:', e);
+                                }
+                            }
+                            if (!deadline || deadline === 'NaN-NaN-NaN') deadline = new Date().toISOString().split('T')[0];
+                            return {
+                                id: Date.now() + index + Math.random(),
+                                group: row['Nhóm việc'] || row['Group'] || row['Nhom viec'] || 'Chưa phân nhóm',
+                                program: row['Chương trình'] || row['Program'] || row['Chuong trinh'] || '',
+                                title: row['Công việc cụ thể'] || row['Công việc'] || row['Task'] || row['Title'] || row['Cong viec'] || 'Công việc ' + (index + 1),
+                                description: row['Mô tả'] || row['Description'] || row['Mo ta'] || '',
+                                coordinator: row['Người điều phối'] || row['Coordinator'] || row['Nguoi dieu phoi'] || '',
+                                assignee: row['Người thực hiện'] || row['Assignee'] || row['Nguoi thuc hien'] || 'Chưa phân công',
+                                approver: row['Người duyệt'] || row['Approver'] || row['Nguoi duyet'] || '',
+                                deadline: deadline,
+                                frequency: row['Tần suất'] || row['Frequency'] || row['Tan suat'] || 'Một lần',
+                                requiredOutput: row['Đầu ra bắt buộc'] || row['Required Output'] || row['Dau ra'] || '',
+                                status: status,
+                                progress: progress,
+                                submissionLink: '',
+                                submissionNote: '',
+                                lastRecurDate: null
+                            };
+                        }).filter(task => task.title && task.title !== '');
+                        if (confirm(`Tìm thấy ${convertedData.length} công việc. Nhập sẽ ghi đè dữ liệu hiện tại. Tiếp tục?`)) {
+                            tasksData = convertedData;
+                            saveToStorage();
+                            updateStats();
+                            switchView('all');
+                            alert(`✅ Import thành công!\n📊 Tổng: ${convertedData.length}\n✓ Hoàn thành: ${convertedData.filter(t => t.status === 'completed').length}\n⏳ Đang làm: ${convertedData.filter(t => t.status === 'inprogress').length}\n📋 Chưa bắt đầu: ${convertedData.filter(t => t.status === 'pending').length}`);
+                        }
+                    } catch (err) {
+                        console.error('Excel import error:', err);
+                        alert('⚠️ Lỗi đọc file Excel.\n\nKiểm tra:\n- File .xlsx hoặc .xls\n- Có cột "Công việc cụ thể"\n- Dữ liệu từ dòng 2\n\nLỗi: ' + err.message);
+                    }
+                };
+                reader.readAsArrayBuffer(file);
+            };
+            input.click();
+        }
+
+        document.getElementById('taskModal').addEventListener('click', (e) => {
+            if (e.target.id === 'taskModal') closeModal();
+        });
+        document.getElementById('submitModal').addEventListener('click', (e) => {
+            if (e.target.id === 'submitModal') closeSubmitModal();
+        });
+
+        loadData();
+        updateStats();
+        renderTasks(tasksData);
+    </script>
+</body>
+</html>
