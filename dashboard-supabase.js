@@ -481,6 +481,10 @@ async function deleteTask(id) {
 
 // Open submit modal
 function openSubmitModal(id) {
+    console.log('Opening submit modal for task ID:', id);
+    const task = tasksData.find(t => t.id === id);
+    console.log('Task found:', task);
+    
     const form = document.getElementById('submitForm');
     form.taskId.value = id;
     form.submissionLink.value = '';
@@ -497,10 +501,17 @@ function closeSubmitModal() {
 // Save submission
 async function saveSubmission(e) {
     e.preventDefault();
+    console.log('saveSubmission called');
+    
     const form = e.target;
     const formData = new FormData(form);
     const taskId = parseInt(formData.get('taskId'));
     const markComplete = document.getElementById('markCompleteCheck').checked;
+    
+    console.log('Task ID:', taskId);
+    console.log('Mark Complete:', markComplete);
+    console.log('Submission Link:', formData.get('submissionLink'));
+    console.log('Submission Note:', formData.get('submissionNote'));
     
     const updateData = {
         submission_link: formData.get('submissionLink'),
@@ -513,17 +524,27 @@ async function saveSubmission(e) {
         updateData.progress = 100;
     }
     
+    console.log('Update data:', updateData);
+    
     try {
-        await supabase
+        const { data, error } = await supabase
             .from('tasks')
             .update(updateData)
-            .eq('id', taskId);
+            .eq('id', taskId)
+            .select();
         
+        if (error) {
+            console.error('Supabase error:', error);
+            throw error;
+        }
+        
+        console.log('Update successful:', data);
         await loadTasks();
         closeSubmitModal();
+        alert('Nộp bài thành công!');
     } catch (error) {
         console.error('Lỗi nộp bài:', error);
-        alert('Không thể nộp bài!');
+        alert('Không thể nộp bài! Chi tiết: ' + error.message);
     }
 }
 
@@ -602,6 +623,22 @@ function setupRealtimeSync() {
         .subscribe();
 }
 
+// Setup form listeners
+function setupFormListeners() {
+    // Submit form
+    const submitForm = document.getElementById('submitForm');
+    if (submitForm) {
+        submitForm.addEventListener('submit', saveSubmission);
+    }
+    
+    // Task form
+    const taskForm = document.getElementById('taskForm');
+    if (taskForm) {
+        taskForm.addEventListener('submit', saveTask);
+    }
+}
+
 // Initialize
 loadTasks();
 setupRealtimeSync();
+setupFormListeners();
