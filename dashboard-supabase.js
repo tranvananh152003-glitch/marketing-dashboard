@@ -6,23 +6,55 @@ let editingId = null;
 let selectedTasks = new Set();
 let selectionMode = false;
 
+// Kiểm tra Supabase đã load chưa
+function checkSupabaseLoaded() {
+    if (typeof supabase === 'undefined' || !supabase) {
+        console.error('Supabase chưa được khởi tạo!');
+        alert('❌ Lỗi: Không thể kết nối Supabase. Vui lòng kiểm tra cấu hình!');
+        return false;
+    }
+    return true;
+}
+
 // Load dữ liệu từ Supabase
 async function loadTasks() {
+    console.log('=== Loading tasks from Supabase ===');
+    
+    if (!checkSupabaseLoaded()) {
+        document.getElementById('tasksContainer').innerHTML = 
+            '<div style="text-align:center;padding:40px;color:#ef4444;background:white;border-radius:15px;">' +
+            '❌ Lỗi kết nối Supabase<br><small>Vui lòng kiểm tra cấu hình</small></div>';
+        return;
+    }
+    
     try {
+        console.log('Fetching data from Supabase...');
         const { data, error } = await supabase
             .from('tasks')
             .select('*')
             .order('updated_at', { ascending: false });
         
-        if (error) throw error;
+        if (error) {
+            console.error('Supabase error:', error);
+            throw error;
+        }
+        
+        console.log('Data loaded:', data);
+        console.log('Number of tasks:', data ? data.length : 0);
         
         tasksData = data || [];
         checkOverdueTasks();
         updateStats();
         switchView(currentView);
+        
+        console.log('Tasks loaded successfully!');
     } catch (error) {
         console.error('Lỗi load dữ liệu:', error);
-        alert('Không thể tải dữ liệu từ Supabase. Kiểm tra kết nối!');
+        document.getElementById('tasksContainer').innerHTML = 
+            '<div style="text-align:center;padding:40px;color:#ef4444;background:white;border-radius:15px;">' +
+            '❌ Không thể tải dữ liệu từ Supabase<br>' +
+            '<small>Lỗi: ' + error.message + '</small><br><br>' +
+            '<button class="btn btn-primary" onclick="loadTasks()">🔄 Thử lại</button></div>';
     }
 }
 
@@ -485,37 +517,70 @@ function openSubmitModal(id) {
     const task = tasksData.find(t => t.id === id);
     console.log('Task found:', task);
     
+    if (!task) {
+        console.error('Task not found!');
+        alert('Không tìm thấy công việc!');
+        return;
+    }
+    
+    const modal = document.getElementById('submitModal');
     const form = document.getElementById('submitForm');
+    
+    if (!modal || !form) {
+        console.error('Modal or form not found!');
+        alert('Lỗi: Không tìm thấy form nộp bài!');
+        return;
+    }
+    
     form.taskId.value = id;
     form.submissionLink.value = '';
     form.submissionNote.value = '';
     document.getElementById('markCompleteCheck').checked = false;
-    document.getElementById('submitModal').classList.add('active');
+    modal.classList.add('active');
+    
+    console.log('Submit modal opened successfully');
 }
 
 // Close submit modal
 function closeSubmitModal() {
-    document.getElementById('submitModal').classList.remove('active');
+    const modal = document.getElementById('submitModal');
+    if (modal) {
+        modal.classList.remove('active');
+    }
 }
 
 // Save submission
 async function saveSubmission(e) {
     e.preventDefault();
-    console.log('saveSubmission called');
+    e.stopPropagation();
+    console.log('=== saveSubmission called ===');
     
     const form = e.target;
     const formData = new FormData(form);
     const taskId = parseInt(formData.get('taskId'));
+    const submissionLink = formData.get('submissionLink') || '';
+    const submissionNote = formData.get('submissionNote') || '';
     const markComplete = document.getElementById('markCompleteCheck').checked;
     
     console.log('Task ID:', taskId);
+    console.log('Submission Link:', submissionLink);
+    console.log('Submission Note:', submissionNote);
     console.log('Mark Complete:', markComplete);
-    console.log('Submission Link:', formData.get('submissionLink'));
-    console.log('Submission Note:', formData.get('submissionNote'));
+    
+    if (!taskId || isNaN(taskId)) {
+        console.error('Invalid task ID!');
+        alert('Lỗi: ID công việc không hợp lệ!');
+        return;
+    }
+    
+    if (!submissionLink && !submissionNote) {
+        alert('Vui lòng nhập link hoặc ghi chú!');
+        return;
+    }
     
     const updateData = {
-        submission_link: formData.get('submissionLink'),
-        submission_note: formData.get('submissionNote'),
+        submission_link: submissionLink,
+        submission_note: submissionNote,
         updated_at: new Date().toISOString()
     };
     
@@ -527,6 +592,7 @@ async function saveSubmission(e) {
     console.log('Update data:', updateData);
     
     try {
+        console.log('Sending update to Supabase...');
         const { data, error } = await supabase
             .from('tasks')
             .update(updateData)
@@ -539,12 +605,12 @@ async function saveSubmission(e) {
         }
         
         console.log('Update successful:', data);
-        await loadTasks();
         closeSubmitModal();
-        alert('Nộp bài thành công!');
+        await loadTasks();
+        alert('✅ Nộp bài thành công!');
     } catch (error) {
         console.error('Lỗi nộp bài:', error);
-        alert('Không thể nộp bài! Chi tiết: ' + error.message);
+        alert('❌ Không thể nộp bài! Chi tiết: ' + error.message);
     }
 }
 
@@ -628,17 +694,47 @@ function setupFormListeners() {
     // Submit form
     const submitForm = document.getElementById('submitForm');
     if (submitForm) {
+        submitForm.removeEventListener('submit', saveSubmission); // Remove old listener
         submitForm.addEventListener('submit', saveSubmission);
+        console.log('Submit form listener attached');
+    } else {
+        console.error('Submit form not found!');
     }
     
     // Task form
     const taskForm = document.getElementById('taskForm');
     if (taskForm) {
+        taskForm.removeEventListener('submit', saveTask); // Remove old listener
         taskForm.addEventListener('submit', saveTask);
+        console.log('Task form listener attached');
+    } else {
+        console.error('Task form not found!');
     }
 }
 
-// Initialize
-loadTasks();
-setupRealtimeSync();
-setupFormListeners();
+// Initialize when DOM is ready
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+} else {
+    init();
+}
+
+function init() {
+    console.log('Initializing dashboard...');
+    setupFormListeners();
+    setupModalCloseOnBackdrop();
+    loadTasks();
+    setupRealtimeSync();
+}
+
+// Setup modal backdrop click to close
+function setupModalCloseOnBackdrop() {
+    const modals = document.querySelectorAll('.modal');
+    modals.forEach(modal => {
+        modal.addEventListener('click', (e) => {
+            if (e.target === modal) {
+                modal.classList.remove('active');
+            }
+        });
+    });
+}
