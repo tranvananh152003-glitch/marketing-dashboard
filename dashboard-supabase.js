@@ -195,7 +195,7 @@ function renderTasks(tasks) {
             'overdue': 'Quá hạn'
         }[task.status] || task.status;
         
-        const hasSubmission = task.submissionlink || task.submissionnote;
+        const hasSubmission = task.submission_link || task.submission_note;
         
         return `
             <div class="task-card ${task.status}">
@@ -229,7 +229,7 @@ function renderTasks(tasks) {
                     <div class="meta-item">✅ Người duyệt: ${task.approver}</div>
                     <div class="meta-item">📅 Deadline: ${task.deadline}</div>
                     <div class="meta-item">🔁 Tần suất: ${task.frequency}</div>
-                    <div class="meta-item">📦 Đầu ra: ${task.requiredoutput}</div>
+                    <div class="meta-item">📦 Đầu ra: ${task.required_output}</div>
                 </div>
                 
                 <div class="progress-bar">
@@ -240,8 +240,8 @@ function renderTasks(tasks) {
                     <div class="submission-section">
                         <div class="submission-label">📤 Đã nộp bài</div>
                         <div class="submission-content">
-                            ${task.submissionlink ? `<a href="${task.submissionlink}" target="_blank" class="submission-link">🔗 ${task.submissionlink}</a>` : ''}
-                            ${task.submissionnote ? `<span class="submission-file">📄 ${task.submissionnote}</span>` : ''}
+                            ${task.submission_link ? `<a href="${task.submission_link}" target="_blank" class="submission-link">🔗 ${task.submission_link}</a>` : ''}
+                            ${task.submission_note ? `<span class="submission-file">📄 ${task.submission_note}</span>` : ''}
                         </div>
                     </div>
                 ` : `
@@ -408,7 +408,7 @@ function openEditModal(id) {
     form.deadline.value = task.deadline;
     form.frequency.value = task.frequency;
     form.status.value = task.status;
-    form.requiredOutput.value = task.requiredoutput;
+    form.requiredOutput.value = task.required_output;
     form.progress.value = task.progress || 0;
     
     document.getElementById('taskModal').classList.add('active');
@@ -437,7 +437,7 @@ async function saveTask(e) {
         deadline: formData.get('deadline'),
         frequency: formData.get('frequency'),
         status: formData.get('status'),
-        requiredoutput: formData.get('requiredOutput'),
+        required_output: formData.get('requiredOutput'),
         progress: parseInt(formData.get('progress')) || 0,
         updated_at: new Date().toISOString()
     };
@@ -503,8 +503,8 @@ async function saveSubmission(e) {
     const markComplete = document.getElementById('markCompleteCheck').checked;
     
     const updateData = {
-        submissionlink: formData.get('submissionLink'),
-        submissionnote: formData.get('submissionNote'),
+        submission_link: formData.get('submissionLink'),
+        submission_note: formData.get('submissionNote'),
         updated_at: new Date().toISOString()
     };
     
@@ -567,7 +567,7 @@ function importExcel() {
                         deadline: row['Deadline'] || new Date().toISOString().split('T')[0],
                         frequency: row['Tần suất'] || 'Một lần',
                         status: 'pending',
-                        requiredoutput: row['Đầu ra'] || '',
+                        required_output: row['Đầu ra'] || '',
                         progress: 0
                     };
                     

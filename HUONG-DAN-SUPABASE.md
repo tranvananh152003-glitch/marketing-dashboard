@@ -27,17 +27,26 @@ CREATE TABLE tasks (
   status TEXT NOT NULL DEFAULT 'pending',
   deadline DATE,
   assignee TEXT,
+  group TEXT,
+  program TEXT,
+  coordinator TEXT,
+  approver TEXT,
+  frequency TEXT,
+  required_output TEXT,
+  progress INTEGER DEFAULT 0,
+  submission_link TEXT,
+  submission_note TEXT,
   created_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc', NOW()),
   updated_at TIMESTAMP WITH TIME ZONE DEFAULT TIMEZONE('utc', NOW())
 );
 
 -- Thêm dữ liệu mẫu
-INSERT INTO tasks (title, description, status, deadline, assignee) VALUES
-('Lập kế hoạch chiến dịch Q1', 'Hoàn thành kế hoạch marketing cho quý 1/2026', 'completed', '2026-01-15', 'Nguyễn Văn A'),
-('Thiết kế banner quảng cáo', 'Thiết kế các banner cho chiến dịch social media', 'inprogress', '2026-01-20', 'Trần Thị B'),
-('Phân tích đối thủ cạnh tranh', 'Nghiên cứu và phân tích chiến lược của đối thủ', 'pending', '2026-01-25', 'Lê Văn C'),
-('Viết content cho website', 'Cập nhật nội dung trang chủ và landing page', 'inprogress', '2026-01-18', 'Phạm Thị D'),
-('Chuẩn bị báo cáo tháng 12', 'Tổng hợp kết quả marketing tháng 12/2025', 'completed', '2026-01-05', 'Nguyễn Văn A');
+INSERT INTO tasks (title, description, status, deadline, assignee, "group", program, coordinator, approver, frequency, required_output) VALUES
+('Lập kế hoạch chiến dịch Q1', 'Hoàn thành kế hoạch marketing cho quý 1/2026', 'completed', '2026-01-15', 'Nguyễn Văn A', 'Marketing Online', 'Social Media', 'Trần Thị B', 'Lê Văn C', 'Một lần', '1 bản kế hoạch PDF'),
+('Thiết kế banner quảng cáo', 'Thiết kế các banner cho chiến dịch social media', 'inprogress', '2026-01-20', 'Trần Thị B', 'Marketing Online', 'Social Media', 'Nguyễn Văn A', 'Phạm Thị D', 'Một lần', '5 banner thiết kế'),
+('Phân tích đối thủ cạnh tranh', 'Nghiên cứu và phân tích chiến lược của đối thủ', 'pending', '2026-01-25', 'Lê Văn C', 'Marketing Strategy', 'Research', 'Nguyễn Văn A', 'Hoàng Văn E', 'Hàng tháng', '1 báo cáo phân tích'),
+('Viết content cho website', 'Cập nhật nội dung trang chủ và landing page', 'inprogress', '2026-01-18', 'Phạm Thị D', 'Marketing Online', 'Content', 'Trần Thị B', 'Nguyễn Văn A', 'Hàng tuần', '3 bài viết'),
+('Chuẩn bị báo cáo tháng 12', 'Tổng hợp kết quả marketing tháng 12/2025', 'completed', '2026-01-05', 'Nguyễn Văn A', 'Marketing Strategy', 'Report', 'Hoàng Văn E', 'Lê Văn C', 'Hàng tháng', '1 báo cáo PowerPoint');
 
 -- Tạo function tự động cập nhật updated_at
 CREATE OR REPLACE FUNCTION update_updated_at_column()
