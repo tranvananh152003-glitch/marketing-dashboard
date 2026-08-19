@@ -605,9 +605,16 @@ async function saveSubmission(e) {
         }
         
         console.log('Update successful:', data);
+        
+        // Đóng modal TRƯỚC KHI reload
         closeSubmitModal();
+        
+        // Reload data
         await loadTasks();
+        
+        // Hiển thị thông báo thành công
         alert('✅ Nộp bài thành công!');
+        
     } catch (error) {
         console.error('Lỗi nộp bài:', error);
         alert('❌ Không thể nộp bài! Chi tiết: ' + error.message);
