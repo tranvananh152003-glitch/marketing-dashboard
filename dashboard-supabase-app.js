@@ -21,9 +21,9 @@ async function initSupabase() {
 }
 
 // Initialize
-let supabase;
+let supabaseClient;
 initSupabase().then(client => {
-    supabase = client;
+    supabaseClient = client;
     console.log('✅ Supabase ready');
     
     // Start app after Supabase is ready
@@ -50,11 +50,11 @@ const app = {
         try {
             console.log('📥 Loading tasks from Supabase...');
             
-            if (!supabase) {
+            if (!supabaseClient) {
                 throw new Error('Supabase not initialized');
             }
             
-            const { data, error } = await supabase
+            const { data, error } = await supabaseClient
                 .from('tasks')
                 .select('*')
                 .order('updated_at', { ascending: false });
@@ -95,7 +95,7 @@ const app = {
                 if (deadline < today && task.status !== 'overdue') {
                     task.status = 'overdue';
                     // Update in Supabase async
-                    supabase.from('tasks').update({ status: 'overdue' }).eq('id', task.id);
+                    supabaseClient.from('tasks').update({ status: 'overdue' }).eq('id', task.id);
                 }
             }
         });
@@ -299,7 +299,7 @@ const app = {
         const newStatus = cycle[(currentIndex + 1) % cycle.length];
         
         try {
-            await supabase
+            await supabaseClient
                 .from('tasks')
                 .update({ 
                     status: newStatus, 
@@ -377,7 +377,7 @@ const app = {
         if (!confirm('Xóa công việc này?')) return;
         
         try {
-            await supabase.from('tasks').delete().eq('id', id);
+            await supabaseClient.from('tasks').delete().eq('id', id);
             await this.loadTasks();
         } catch (error) {
             console.error('Delete error:', error);
@@ -430,7 +430,7 @@ const app = {
                             updated_at: new Date().toISOString()
                         };
                         
-                        await supabase.from('tasks').insert([taskData]);
+                        await supabaseClient.from('tasks').insert([taskData]);
                     }
                     
                     await this.loadTasks();
@@ -473,9 +473,9 @@ function startApp() {
         
         try {
             if (app.editingId) {
-                await supabase.from('tasks').update(taskData).eq('id', app.editingId);
+                await supabaseClient.from('tasks').update(taskData).eq('id', app.editingId);
             } else {
-                await supabase.from('tasks').insert([taskData]);
+                await supabaseClient.from('tasks').insert([taskData]);
             }
             
             app.closeModal();
@@ -525,7 +525,7 @@ function startApp() {
             
             console.log('Updating...', updateData);
             
-            await supabase.from('tasks').update(updateData).eq('id', taskId);
+            await supabaseClient.from('tasks').update(updateData).eq('id', taskId);
             
             console.log('✅ Success');
             
@@ -549,7 +549,7 @@ function startApp() {
     });
     
     // Realtime sync
-    supabase
+    supabaseClient
         .channel('tasks-changes')
         .on('postgres_changes', 
             { event: '*', schema: 'public', table: 'tasks' },

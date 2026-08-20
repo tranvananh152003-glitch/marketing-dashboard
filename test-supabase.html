@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Supabase</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+</head>
+<body>
+    <h1>Test Supabase Connection</h1>
+    <button onclick="testConnection()">Test Connection</button>
+    <button onclick="loadTasks()">Load Tasks</button>
+    <div id="result" style="margin-top:20px;padding:20px;background:#f0f0f0;"></div>
+    
+    <script>
+        const supabaseUrl = 'https://mtzkanuzjeaoejahwmmm.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10emthbnV6amVhb2VqYWh3bW1tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcwOTM1NjcsImV4cCI6MjEwMjY2OTU2N30.Darv0i4Tfabeqit_OERNxISrf9W-eqCYKABaFFitBBw';
+        
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+        
+        async function testConnection() {
+            document.getElementById('result').innerHTML = 'Testing...';
+            try {
+                const { data, error } = await supabase.from('tasks').select('count', { count: 'exact', head: true });
+                if (error) throw error;
+                document.getElementById('result').innerHTML = '✅ Connection OK! Tasks count: ' + (data?.length || 0);
+            } catch (error) {
+                document.getElementById('result').innerHTML = '❌ Error: ' + error.message;
+            }
+        }
+        
+        async function loadTasks() {
+            document.getElementById('result').innerHTML = 'Loading...';
+            try {
+                const { data, error } = await supabase.from('tasks').select('*');
+                if (error) throw error;
+                document.getElementById('result').innerHTML = '✅ Loaded ' + data.length + ' tasks:<br><pre>' + JSON.stringify(data, null, 2) + '</pre>';
+            } catch (error) {
+                document.getElementById('result').innerHTML = '❌ Error: ' + error.message;
+            }
+        }
+    </script>
+</body>
+</html>
