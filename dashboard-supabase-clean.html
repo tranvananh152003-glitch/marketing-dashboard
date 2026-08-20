@@ -4,22 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard Marketing 2026 - Supabase</title>
+    <link rel="stylesheet" href="dashboard-supabase.css">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <div class="container">
         <header>
             <h1>📊 Bảng Theo Dõi Marketing 2026</h1>
             <div class="header-actions">
-                <button class="btn btn-success" onclick="openAddModal()">➕ Thêm công việc</button>
-                <button class="btn btn-primary" id="selectModeBtn" onclick="toggleSelectionMode()">☑️ Chọn nhiều</button>
-                <button class="btn btn-primary" onclick="exportData()">💾 Xuất dữ liệu</button>
-                <button class="btn btn-primary" onclick="importExcel()">📊 Nhập Excel</button>
+                <button class="btn btn-success" onclick="app.openAddModal()">➕ Thêm công việc</button>
+                <button class="btn btn-primary" onclick="app.exportData()">💾 Xuất dữ liệu</button>
+                <button class="btn btn-primary" onclick="app.importExcel()">📊 Nhập Excel</button>
             </div>
             <div style="margin-top:15px;color:#666;font-size:14px;">
-                Cập nhật: <span id="lastUpdate"></span>
+                Cập nhật: <span id="lastUpdate">-</span>
             </div>
         </header>
 
@@ -47,9 +46,9 @@
         </div>
 
         <div class="view-tabs">
-            <button class="view-tab active" onclick="switchView('all')">📋 Tất cả</button>
-            <button class="view-tab" onclick="switchView('group')">📁 Theo nhóm việc</button>
-            <button class="view-tab" onclick="switchView('people')">👥 Theo người</button>
+            <button class="view-tab active" onclick="app.switchView('all')">📋 Tất cả</button>
+            <button class="view-tab" onclick="app.switchView('group')">📁 Theo nhóm việc</button>
+            <button class="view-tab" onclick="app.switchView('people')">👥 Theo người</button>
         </div>
 
         <div id="groupTabs" class="group-tabs" style="display:none;"></div>
@@ -59,18 +58,8 @@
             <div style="text-align:center;padding:40px;color:#667eea;background:white;border-radius:15px;">
                 <div style="font-size:48px;margin-bottom:20px;">⏳</div>
                 <div style="font-size:18px;font-weight:600;">Đang tải dữ liệu...</div>
-                <div style="font-size:14px;color:#666;margin-top:10px;">Vui lòng đợi trong giây lát</div>
             </div>
         </div>
-    </div>
-
-    <!-- Bulk Actions Bar -->
-    <div class="bulk-actions-bar" id="bulkActionsBar">
-        <span class="bulk-count">Đã chọn: <strong id="selectedCount">0</strong></span>
-        <button class="bulk-btn select-all" onclick="selectAll()">☑️ Chọn tất cả</button>
-        <button class="bulk-btn complete" onclick="bulkComplete()">✅ Hoàn thành</button>
-        <button class="bulk-btn delete" onclick="bulkDelete()">🗑️ Xóa</button>
-        <button class="bulk-btn cancel" onclick="exitSelectionMode()">✕ Thoát</button>
     </div>
 
     <!-- Modal Nộp bài -->
@@ -79,33 +68,39 @@
             <div class="modal-header">📤 Nộp bài</div>
             <form id="submitForm">
                 <div class="form-group">
-                    <label>Link nộp bài (Google Drive, Figma, ...)</label>
+                    <label>Link nộp bài</label>
                     <input type="url" name="submissionLink" placeholder="https://...">
                 </div>
                 
                 <div class="form-group">
+                    <label>📎 Hoặc đính kèm file</label>
+                    <input type="file" name="submissionFile" accept="image/*,.pdf,.doc,.docx,.zip" multiple>
+                    <small style="color:#666;font-size:12px;">Ảnh, PDF, Word, ZIP</small>
+                </div>
+                
+                <div class="form-group">
                     <label>Ghi chú</label>
-                    <input type="text" name="submissionNote" placeholder="VD: File đã gửi email, Đã in 100 tờ rơi">
+                    <input type="text" name="submissionNote" placeholder="VD: File đã gửi email">
                 </div>
                 
                 <div class="form-group">
                     <label style="display:flex;align-items:center;gap:10px;">
                         <input type="checkbox" id="markCompleteCheck" style="width:20px;height:20px;">
-                        <span>Đánh dấu công việc đã hoàn thành</span>
+                        <span>Đánh dấu hoàn thành</span>
                     </label>
                 </div>
                 
                 <input type="hidden" name="taskId">
                 
                 <div class="modal-actions">
-                    <button type="button" class="btn" onclick="closeSubmitModal()" style="background:#6b7280;color:white;">Hủy</button>
+                    <button type="button" class="btn" onclick="app.closeSubmitModal()" style="background:#6b7280;color:white;">Hủy</button>
                     <button type="submit" class="btn btn-success">Nộp</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Modal -->
+    <!-- Modal Thêm/Sửa -->
     <div class="modal" id="taskModal">
         <div class="modal-content">
             <div class="modal-header" id="modalTitle">Thêm công việc mới</div>
@@ -122,13 +117,13 @@
                 </div>
                 
                 <div class="form-group full-width">
-                    <label>Công việc cụ thể *</label>
+                    <label>Công việc *</label>
                     <input type="text" name="title" required placeholder="VD: Đăng bài Facebook">
                 </div>
                 
                 <div class="form-group full-width">
                     <label>Mô tả</label>
-                    <textarea name="description" placeholder="Mô tả chi tiết công việc..."></textarea>
+                    <textarea name="description" placeholder="Mô tả chi tiết..."></textarea>
                 </div>
                 
                 <div class="form-grid">
@@ -166,7 +161,6 @@
                             <option value="pending">Chưa bắt đầu</option>
                             <option value="inprogress">Đang thực hiện</option>
                             <option value="completed">Hoàn thành</option>
-                            <option value="overdue">Quá hạn</option>
                         </select>
                     </div>
                 </div>
@@ -183,32 +177,20 @@
                 
                 <input type="hidden" name="id">
                 <div class="modal-actions">
-                    <button type="button" class="btn" onclick="closeModal()" style="background:#6b7280;color:white;">Hủy</button>
+                    <button type="button" class="btn" onclick="app.closeModal()" style="background:#6b7280;color:white;">Hủy</button>
                     <button type="submit" class="btn btn-success">Lưu</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Supabase Config & Main Script -->
+    <!-- Supabase Config -->
     <script>
-        // Khởi tạo Supabase
-        const SUPABASE_URL = 'https://mtzkanuzjeaoejahwmmm.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10emthbnV6amVhb2VqYWh3bW1tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcwOTM1NjcsImV4cCI6MjEwMjY2OTU2N30.Darv0i4Tfabeqit_OERNxISrf9W-eqCYKABaFFitBBw';
-        
-        if (typeof window.supabase === 'undefined') {
-            console.error('❌ Supabase library chưa được tải!');
-            document.getElementById('tasksContainer').innerHTML = 
-                '<div style="text-align:center;padding:40px;color:#ef4444;background:white;border-radius:15px;">' +
-                '❌ Lỗi: Không tải được thư viện Supabase<br><small>Vui lòng kiểm tra kết nối internet</small></div>';
-        } else {
-            console.log('✅ Supabase library đã load');
-            const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-            window.supabase = supabase;
-            console.log('✅ Supabase client khởi tạo thành công');
-            console.log('📍 URL:', SUPABASE_URL);
-        }
+        window.SUPABASE_CONFIG = {
+            url: 'https://mtzkanuzjeaoejahwmmm.supabase.co',
+            key: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10emthbnV6amVhb2VqYWh3bW1tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcwOTM1NjcsImV4cCI6MjEwMjY2OTU2N30.Darv0i4Tfabeqit_OERNxISrf9W-eqCYKABaFFitBBw'
+        };
     </script>
-    <script src="dashboard-supabase.js"></script>
+    <script src="dashboard-supabase-app.js"></script>
 </body>
 </html>
