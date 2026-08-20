@@ -1,10 +1,11 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard Marketing 2026 - V2</title>
+    <title>Dashboard Marketing 2026 - Supabase</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
     <script type='module'>
         import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js';
@@ -330,46 +331,46 @@
 <body>
     <div class="container">
         <header>
-            <h1>📊 Bảng Theo Dõi Marketing 2026</h1>
+            <h1>?? B?ng Theo D�i Marketing 2026</h1>
             <div class="header-actions">
-                <button class="btn btn-success" onclick="openAddModal()">➕ Thêm công việc</button>
-                <button class="btn btn-primary" id="selectModeBtn" onclick="toggleSelectionMode()">☑️ Chọn nhiều</button>
-                <button class="btn btn-primary" onclick="exportData()">💾 Xuất dữ liệu</button>
-                <button class="btn btn-danger" onclick="importJSON()">📥 Nhập JSON</button>
-                <button class="btn btn-primary" onclick="importExcel()">📊 Nhập Excel</button>
+                <button class="btn btn-success" onclick="openAddModal()">? Th�m c�ng vi?c</button>
+                <button class="btn btn-primary" id="selectModeBtn" onclick="toggleSelectionMode()">?? Ch?n nhi?u</button>
+                <button class="btn btn-primary" onclick="exportData()">?? Xu?t d? li?u</button>
+                <button class="btn btn-danger" onclick="importJSON()">?? Nh?p JSON</button>
+                <button class="btn btn-primary" onclick="importExcel()">?? Nh?p Excel</button>
             </div>
             <div style="margin-top:15px;color:#666;font-size:14px;">
-                Cập nhật: <span id="lastUpdate"></span>
+                C?p nh?t: <span id="lastUpdate"></span>
             </div>
         </header>
 
         <div class="stats-grid">
             <div class="stat-card completed">
-                <div class="stat-icon">✅</div>
+                <div class="stat-icon">?</div>
                 <div class="stat-value" id="completedTasks">0</div>
-                <div class="stat-label">Hoàn thành</div>
+                <div class="stat-label">Ho�n th�nh</div>
             </div>
             <div class="stat-card progress">
-                <div class="stat-icon">⏳</div>
+                <div class="stat-icon">?</div>
                 <div class="stat-value" id="inProgressTasks">0</div>
-                <div class="stat-label">Đang thực hiện</div>
+                <div class="stat-label">�ang th?c hi?n</div>
             </div>
             <div class="stat-card pending">
-                <div class="stat-icon">📋</div>
+                <div class="stat-icon">??</div>
                 <div class="stat-value" id="pendingTasks">0</div>
-                <div class="stat-label">Chưa bắt đầu</div>
+                <div class="stat-label">Chua b?t d?u</div>
             </div>
             <div class="stat-card overdue">
-                <div class="stat-icon">⚠️</div>
+                <div class="stat-icon">??</div>
                 <div class="stat-value" id="overdueTasks">0</div>
-                <div class="stat-label">Quá hạn</div>
+                <div class="stat-label">Qu� h?n</div>
             </div>
         </div>
 
         <div class="view-tabs">
-            <button class="view-tab active" onclick="switchView('all')">📋 Tất cả</button>
-            <button class="view-tab" onclick="switchView('group')">📁 Theo nhóm việc</button>
-            <button class="view-tab" onclick="switchView('people')">👥 Theo người</button>
+            <button class="view-tab active" onclick="switchView('all')">?? T?t c?</button>
+            <button class="view-tab" onclick="switchView('group')">?? Theo nh�m vi?c</button>
+            <button class="view-tab" onclick="switchView('people')">?? Theo ngu?i</button>
         </div>
 
         <div id="groupTabs" class="group-tabs" style="display:none;"></div>
@@ -377,12 +378,12 @@
         <div id="personTabs" class="person-tabs" style="display:none;"></div>
 
         <div id="groupSelectContainer" class="group-select-container" style="display:none;">
-            <div class="group-select-label">📁 Chọn nhóm việc:</div>
+            <div class="group-select-label">?? Ch?n nh�m vi?c:</div>
             <select id="groupSelect" class="group-select" onchange="switchGroup(this.value)"></select>
         </div>
 
         <div id="personSelectContainer" class="group-select-container" style="display:none;">
-            <div class="group-select-label">👤 Chọn người xem:</div>
+            <div class="group-select-label">?? Ch?n ngu?i xem:</div>
             <select id="personSelect" class="person-select" onchange="switchPerson(this.value)"></select>
         </div>
 
@@ -391,40 +392,40 @@
 
     <!-- Bulk Actions Bar -->
     <div class="bulk-actions-bar" id="bulkActionsBar">
-        <span class="bulk-count">Đã chọn: <strong id="selectedCount">0</strong></span>
-        <button class="bulk-btn select-all" onclick="selectAll()">☑️ Chọn tất cả</button>
-        <button class="bulk-btn complete" onclick="bulkComplete()">✅ Hoàn thành</button>
-        <button class="bulk-btn delete" onclick="bulkDelete()">🗑️ Xóa</button>
-        <button class="bulk-btn cancel" onclick="exitSelectionMode()">✕ Thoát</button>
+        <span class="bulk-count">�� ch?n: <strong id="selectedCount">0</strong></span>
+        <button class="bulk-btn select-all" onclick="selectAll()">?? Ch?n t?t c?</button>
+        <button class="bulk-btn complete" onclick="bulkComplete()">? Ho�n th�nh</button>
+        <button class="bulk-btn delete" onclick="bulkDelete()">??? X�a</button>
+        <button class="bulk-btn cancel" onclick="exitSelectionMode()">? Tho�t</button>
     </div>
 
-    <!-- Modal Nộp bài -->
+    <!-- Modal N?p b�i -->
     <div class="modal" id="submitModal">
         <div class="modal-content">
-            <div class="modal-header">📤 Nộp bài</div>
+            <div class="modal-header">?? N?p b�i</div>
             <form id="submitForm" onsubmit="saveSubmission(event)">
                 <div class="form-group">
-                    <label>Link nộp bài (Google Drive, Figma, ...)</label>
+                    <label>Link n?p b�i (Google Drive, Figma, ...)</label>
                     <input type="url" name="submissionLink" placeholder="https://...">
                 </div>
                 
                 <div class="form-group">
-                    <label>Ghi chú</label>
-                    <input type="text" name="submissionNote" placeholder="VD: File đã gửi email, Đã in 100 tờ rơi">
+                    <label>Ghi ch�</label>
+                    <input type="text" name="submissionNote" placeholder="VD: File d� g?i email, �� in 100 t? roi">
                 </div>
                 
                 <div class="form-group">
                     <label style="display:flex;align-items:center;gap:10px;">
                         <input type="checkbox" id="markCompleteCheck" style="width:20px;height:20px;">
-                        <span>Đánh dấu công việc đã hoàn thành</span>
+                        <span>��nh d?u c�ng vi?c d� ho�n th�nh</span>
                     </label>
                 </div>
                 
                 <input type="hidden" name="taskId">
                 
                 <div class="modal-actions">
-                    <button type="button" class="btn" onclick="closeSubmitModal()" style="background:#6b7280;color:white;">Hủy</button>
-                    <button type="submit" class="btn btn-success">Nộp</button>
+                    <button type="button" class="btn" onclick="closeSubmitModal()" style="background:#6b7280;color:white;">H?y</button>
+                    <button type="submit" class="btn btn-success">N?p</button>
                 </div>
             </form>
         </div>
@@ -433,40 +434,40 @@
     <!-- Modal -->
     <div class="modal" id="taskModal">
         <div class="modal-content">
-            <div class="modal-header" id="modalTitle">Thêm công việc mới</div>
+            <div class="modal-header" id="modalTitle">Th�m c�ng vi?c m?i</div>
             <form id="taskForm" onsubmit="saveTask(event)">
                 <div class="form-grid">
                     <div class="form-group">
-                        <label>Nhóm việc *</label>
+                        <label>Nh�m vi?c *</label>
                         <input type="text" name="group" required placeholder="VD: Marketing Online">
                     </div>
                     <div class="form-group">
-                        <label>Chương trình *</label>
+                        <label>Chuong tr�nh *</label>
                         <input type="text" name="program" required placeholder="VD: Social Media">
                     </div>
                 </div>
                 
                 <div class="form-group full-width">
-                    <label>Công việc cụ thể *</label>
-                    <input type="text" name="title" required placeholder="VD: Đăng bài Facebook">
+                    <label>C�ng vi?c c? th? *</label>
+                    <input type="text" name="title" required placeholder="VD: �ang b�i Facebook">
                 </div>
                 
                 <div class="form-group full-width">
-                    <label>Mô tả</label>
-                    <textarea name="description" placeholder="Mô tả chi tiết công việc..."></textarea>
+                    <label>M� t?</label>
+                    <textarea name="description" placeholder="M� t? chi ti?t c�ng vi?c..."></textarea>
                 </div>
                 
                 <div class="form-grid">
                     <div class="form-group">
-                        <label>Người điều phối *</label>
+                        <label>Ngu?i di?u ph?i *</label>
                         <input type="text" name="coordinator" required>
                     </div>
                     <div class="form-group">
-                        <label>Người thực hiện *</label>
+                        <label>Ngu?i th?c hi?n *</label>
                         <input type="text" name="assignee" required>
                     </div>
                     <div class="form-group">
-                        <label>Người duyệt *</label>
+                        <label>Ngu?i duy?t *</label>
                         <input type="text" name="approver" required>
                     </div>
                 </div>
@@ -477,49 +478,49 @@
                         <input type="date" name="deadline" required>
                     </div>
                     <div class="form-group">
-                        <label>Tần suất *</label>
+                        <label>T?n su?t *</label>
                         <select name="frequency" required>
-                            <option value="Một lần">Một lần</option>
-                            <option value="Hàng ngày">Hàng ngày</option>
-                            <option value="Hàng tuần">Hàng tuần</option>
-                            <option value="Hàng tháng">Hàng tháng</option>
+                            <option value="M?t l?n">M?t l?n</option>
+                            <option value="H�ng ng�y">H�ng ng�y</option>
+                            <option value="H�ng tu?n">H�ng tu?n</option>
+                            <option value="H�ng th�ng">H�ng th�ng</option>
                         </select>
                     </div>
                     <div class="form-group">
-                        <label>Trạng thái *</label>
+                        <label>Tr?ng th�i *</label>
                         <select name="status" required>
-                            <option value="pending">Chưa bắt đầu</option>
-                            <option value="inprogress">Đang thực hiện</option>
-                            <option value="completed">Hoàn thành</option>
-                            <option value="overdue">Quá hạn</option>
+                            <option value="pending">Chua b?t d?u</option>
+                            <option value="inprogress">�ang th?c hi?n</option>
+                            <option value="completed">Ho�n th�nh</option>
+                            <option value="overdue">Qu� h?n</option>
                         </select>
                     </div>
                 </div>
                 
                 <div class="form-group full-width">
-                    <label>Đầu ra bắt buộc *</label>
-                    <input type="text" name="requiredOutput" required placeholder="VD: 1 bài post + 3 ảnh">
+                    <label>�?u ra b?t bu?c *</label>
+                    <input type="text" name="requiredOutput" required placeholder="VD: 1 b�i post + 3 ?nh">
                 </div>
                 
                 <div class="form-group">
-                    <label>Tiến độ (%) *</label>
+                    <label>Ti?n d? (%) *</label>
                     <input type="number" name="progress" min="0" max="100" value="0" required>
                 </div>
                 
                 <div class="form-group full-width">
-                    <label>Link nộp bài (tùy chọn)</label>
+                    <label>Link n?p b�i (t�y ch?n)</label>
                     <input type="url" name="submissionLink" placeholder="https://...">
                 </div>
                 
                 <div class="form-group full-width">
-                    <label>Ghi chú nộp bài (tùy chọn)</label>
-                    <input type="text" name="submissionNote" placeholder="Tên file hoặc ghi chú">
+                    <label>Ghi ch� n?p b�i (t�y ch?n)</label>
+                    <input type="text" name="submissionNote" placeholder="T�n file ho?c ghi ch�">
                 </div>
                 
                 <input type="hidden" name="id">
                 <div class="modal-actions">
-                    <button type="button" class="btn" onclick="closeModal()" style="background:#6b7280;color:white;">Hủy</button>
-                    <button type="submit" class="btn btn-success">Lưu</button>
+                    <button type="button" class="btn" onclick="closeModal()" style="background:#6b7280;color:white;">H?y</button>
+                    <button type="submit" class="btn btn-success">Luu</button>
                 </div>
             </form>
         </div>
@@ -534,21 +535,21 @@
         let selectedTasks = new Set();
         let selectionMode = false;
 
-        // Dữ liệu mẫu
+        // D? li?u m?u
         const defaultData = [
             {
                 id: Date.now() + 1,
                 group: "Marketing Online",
                 program: "Social Media",
-                title: "Đăng bài Facebook",
-                coordinator: "Nguyễn Văn A",
-                assignee: "Trần Thị B",
-                approver: "Lê Văn C",
+                title: "�ang b�i Facebook",
+                coordinator: "Nguy?n Van A",
+                assignee: "Tr?n Th? B",
+                approver: "L� Van C",
                 deadline: "2026-01-15",
-                frequency: "Hàng ngày",
-                requiredOutput: "1 bài post + ảnh",
+                frequency: "H�ng ng�y",
+                requiredOutput: "1 b�i post + ?nh",
                 status: "completed",
-                description: "Đăng bài quảng cáo sản phẩm",
+                description: "�ang b�i qu?ng c�o s?n ph?m",
                 progress: 100,
                 lastRecurDate: "2026-01-15",
                 submissionLink: "",
@@ -557,24 +558,24 @@
             {
                 id: Date.now() + 2,
                 group: "Marketing Offline",
-                program: "Sự kiện",
-                title: "Chuẩn bị booth triển lãm",
-                coordinator: "Phạm Thị D",
-                assignee: "Nguyễn Văn A",
-                approver: "Hoàng Văn E",
+                program: "S? ki?n",
+                title: "Chu?n b? booth tri?n l�m",
+                coordinator: "Ph?m Th? D",
+                assignee: "Nguy?n Van A",
+                approver: "Ho�ng Van E",
                 deadline: "2026-01-20",
-                frequency: "Một lần",
+                frequency: "M?t l?n",
                 requiredOutput: "Booth + catalog",
                 status: "inprogress",
-                description: "Setup booth cho triển lãm",
+                description: "Setup booth cho tri?n l�m",
                 progress: 60,
                 lastRecurDate: null,
                 submissionLink: "https://drive.google.com/example",
-                submissionNote: "File thiết kế booth"
+                submissionNote: "File thi?t k? booth"
             }
         ];
 
-        // Load dữ liệu
+        // Load d? li?u
         function loadData() {
             const saved = localStorage.getItem('marketingTasksV2');
             if (saved) {
@@ -591,14 +592,14 @@
             localStorage.setItem('marketingTasksV2', JSON.stringify(tasksData));
         }
 
-        // Kiểm tra và tạo task lặp lại
+        // Ki?m tra v� t?o task l?p l?i
         function checkRecurringTasks() {
             const today = new Date().toISOString().split('T')[0];
             let updated = false;
 
             tasksData.forEach(task => {
-                if (task.frequency === 'Hàng ngày' && task.lastRecurDate !== today) {
-                    // Tạo task mới cho hôm nay
+                if (task.frequency === 'H�ng ng�y' && task.lastRecurDate !== today) {
+                    // T?o task m?i cho h�m nay
                     const newTask = {
                         ...task,
                         id: Date.now() + Math.random(),
@@ -618,7 +619,7 @@
             if (updated) saveToStorage();
         }
 
-        // Kiểm tra quá hạn
+        // Ki?m tra qu� h?n
         function checkOverdueTasks() {
             const today = new Date();
             today.setHours(0, 0, 0, 0);
@@ -639,7 +640,7 @@
             if (updated) saveToStorage();
         }
 
-        // Cập nhật thống kê
+        // C?p nh?t th?ng k�
         function updateStats() {
             checkRecurringTasks();
             checkOverdueTasks();
@@ -656,7 +657,7 @@
             document.getElementById('lastUpdate').textContent = new Date().toLocaleString('vi-VN');
         }
 
-        // Chuyển nhóm
+        // Chuy?n nh�m
         function switchGroup(group) {
             currentGroup = group;
             
@@ -670,7 +671,7 @@
             renderTasks(filtered);
         }
 
-        // Chuyển người
+        // Chuy?n ngu?i
         function switchPerson(person) {
             currentPerson = person;
             
@@ -690,11 +691,11 @@
             const btn = document.getElementById('selectModeBtn');
             
             if (selectionMode) {
-                btn.textContent = '✕ Hủy chọn';
+                btn.textContent = '? H?y ch?n';
                 btn.style.background = '#6b7280';
                 updateBulkActionsBar();
             } else {
-                btn.textContent = '☑️ Chọn nhiều';
+                btn.textContent = '?? Ch?n nhi?u';
                 btn.style.background = '#667eea';
                 selectedTasks.clear();
                 document.getElementById('bulkActionsBar').classList.remove('show');
@@ -708,7 +709,7 @@
             selectionMode = false;
             selectedTasks.clear();
             const btn = document.getElementById('selectModeBtn');
-            btn.textContent = '☑️ Chọn nhiều';
+            btn.textContent = '?? Ch?n nhi?u';
             btn.style.background = '#667eea';
             document.getElementById('bulkActionsBar').classList.remove('show');
             switchView(currentView);
@@ -764,11 +765,11 @@
         // Bulk complete
         function bulkComplete() {
             if (selectedTasks.size === 0) {
-                alert('Chưa chọn công việc nào!');
+                alert('Chua ch?n c�ng vi?c n�o!');
                 return;
             }
             
-            if (confirm(`Đánh dấu hoàn thành ${selectedTasks.size} công việc?`)) {
+            if (confirm(`��nh d?u ho�n th�nh ${selectedTasks.size} c�ng vi?c?`)) {
                 selectedTasks.forEach(id => {
                     const task = tasksData.find(t => t.id === id);
                     if (task) {
@@ -786,11 +787,11 @@
         // Bulk delete
         function bulkDelete() {
             if (selectedTasks.size === 0) {
-                alert('Chưa chọn công việc nào!');
+                alert('Chua ch?n c�ng vi?c n�o!');
                 return;
             }
             
-            if (confirm(`Xóa ${selectedTasks.size} công việc? Không thể hoàn tác!`)) {
+            if (confirm(`X�a ${selectedTasks.size} c�ng vi?c? Kh�ng th? ho�n t�c!`)) {
                 const selectedIds = Array.from(selectedTasks);
                 tasksData = tasksData.filter(t => !selectedIds.includes(t.id));
                 saveToStorage();
@@ -799,7 +800,7 @@
             }
         }
 
-        // Chuyển view
+        // Chuy?n view
         function switchView(view) {
             currentView = view;
             document.querySelectorAll('.view-tab').forEach(tab => tab.classList.remove('active'));
@@ -825,7 +826,7 @@
         function renderGroupTabs() {
             const groupsMap = {};
             
-            // Đếm số công việc của mỗi nhóm
+            // �?m s? c�ng vi?c c?a m?i nh�m
             tasksData.forEach(task => {
                 if (!groupsMap[task.group]) {
                     groupsMap[task.group] = 0;
@@ -837,7 +838,7 @@
             const container = document.getElementById('groupTabs');
             
             if (groups.length === 0) {
-                container.innerHTML = '<div style="padding:20px;color:#666;">Chưa có nhóm việc nào</div>';
+                container.innerHTML = '<div style="padding:20px;color:#666;">Chua c� nh�m vi?c n�o</div>';
                 return;
             }
             
@@ -853,7 +854,7 @@
                 `;
             }).join('');
             
-            // Nếu chưa chọn nhóm nào, chọn nhóm đầu tiên
+            // N?u chua ch?n nh�m n�o, ch?n nh�m d?u ti�n
             if (currentGroup === null && groups.length > 0) {
                 currentGroup = groups[0];
             }
@@ -865,7 +866,7 @@
         function renderPersonTabs() {
             const peopleMap = {};
             
-            // Đếm số công việc của mỗi người
+            // �?m s? c�ng vi?c c?a m?i ngu?i
             tasksData.forEach(task => {
                 if (!peopleMap[task.assignee]) {
                     peopleMap[task.assignee] = 0;
@@ -877,7 +878,7 @@
             const container = document.getElementById('personTabs');
             
             if (people.length === 0) {
-                container.innerHTML = '<div style="padding:20px;color:#666;">Chưa có người thực hiện nào</div>';
+                container.innerHTML = '<div style="padding:20px;color:#666;">Chua c� ngu?i th?c hi?n n�o</div>';
                 return;
             }
             
@@ -893,7 +894,7 @@
                 `;
             }).join('');
             
-            // Nếu chưa chọn người nào, chọn người đầu tiên
+            // N?u chua ch?n ngu?i n�o, ch?n ngu?i d?u ti�n
             if (currentPerson === null && people.length > 0) {
                 currentPerson = people[0];
             }
@@ -901,12 +902,12 @@
             switchPerson(currentPerson);
         }
 
-        // Hiển thị tasks
+        // Hi?n th? tasks
         function renderTasks(tasks) {
             const container = document.getElementById('tasksContainer');
             
             if (tasks.length === 0) {
-                container.innerHTML = '<div style="text-align:center;padding:40px;color:white;font-size:18px;">Không có công việc nào</div>';
+                container.innerHTML = '<div style="text-align:center;padding:40px;color:white;font-size:18px;">Kh�ng c� c�ng vi?c n�o</div>';
                 return;
             }
 
@@ -918,43 +919,43 @@
                                    id="check-${task.id}" 
                                    onchange="toggleTask(${task.id})"
                                    ${selectedTasks.has(task.id) ? 'checked' : ''}>
-                            <label for="check-${task.id}" style="cursor:pointer;user-select:none;">Chọn</label>
+                            <label for="check-${task.id}" style="cursor:pointer;user-select:none;">Ch?n</label>
                         </div>
                         <div class="task-action-btns">
-                            <button class="task-action-btn edit" onclick="editTask(${task.id})">✏️ Sửa</button>
-                            <button class="task-action-btn delete" onclick="deleteTask(${task.id})">🗑️ Xóa</button>
+                            <button class="task-action-btn edit" onclick="editTask(${task.id})">?? S?a</button>
+                            <button class="task-action-btn delete" onclick="deleteTask(${task.id})">??? X�a</button>
                         </div>
                     </div>
-                    <span class="task-status-badge ${task.status}" onclick="changeStatus(${task.id})" title="Click để đổi trạng thái">
+                    <span class="task-status-badge ${task.status}" onclick="changeStatus(${task.id})" title="Click d? d?i tr?ng th�i">
                         ${getStatusText(task.status)}
                     </span>
-                    <div class="task-group">📁 ${task.group} » ${task.program}</div>
+                    <div class="task-group">?? ${task.group} � ${task.program}</div>
                     <div class="task-header">
                         <div class="task-title">${task.title}</div>
                     </div>
                     <div class="task-info">${task.description || ''}</div>
                     <div class="task-meta">
-                        <div class="meta-item">📅 Deadline: ${formatDate(task.deadline)}</div>
-                        <div class="meta-item">🔄 Tần suất: ${task.frequency}</div>
-                        <div class="meta-item">👤 Thực hiện: ${task.assignee}</div>
-                        <div class="meta-item">📋 Điều phối: ${task.coordinator}</div>
-                        <div class="meta-item">✅ Duyệt: ${task.approver}</div>
-                        <div class="meta-item">📊 Tiến độ: ${task.progress}%</div>
+                        <div class="meta-item">?? Deadline: ${formatDate(task.deadline)}</div>
+                        <div class="meta-item">?? T?n su?t: ${task.frequency}</div>
+                        <div class="meta-item">?? Th?c hi?n: ${task.assignee}</div>
+                        <div class="meta-item">?? �i?u ph?i: ${task.coordinator}</div>
+                        <div class="meta-item">? Duy?t: ${task.approver}</div>
+                        <div class="meta-item">?? Ti?n d?: ${task.progress}%</div>
                     </div>
                     <div style="margin-top:10px;padding:10px;background:#f0f9ff;border-radius:8px;">
-                        <strong style="color:#0369a1;">📦 Đầu ra:</strong> ${task.requiredOutput}
+                        <strong style="color:#0369a1;">?? �?u ra:</strong> ${task.requiredOutput}
                     </div>
                     ${task.submissionLink || task.submissionNote ? `
                     <div class="submission-section">
-                        <div class="submission-label">📎 Đã nộp bài:</div>
+                        <div class="submission-label">?? �� n?p b�i:</div>
                         <div class="submission-content">
-                            ${task.submissionLink ? `<a href="${task.submissionLink}" target="_blank" class="submission-link" onclick="event.stopPropagation()">🔗 ${task.submissionLink}</a>` : ''}
-                            ${task.submissionNote ? `<span class="submission-file">📄 ${task.submissionNote}</span>` : ''}
+                            ${task.submissionLink ? `<a href="${task.submissionLink}" target="_blank" class="submission-link" onclick="event.stopPropagation()">?? ${task.submissionLink}</a>` : ''}
+                            ${task.submissionNote ? `<span class="submission-file">?? ${task.submissionNote}</span>` : ''}
                         </div>
                     </div>
                     ` : task.status !== 'completed' ? `
                     <div style="margin-top:10px;">
-                        <button class="submit-btn" onclick="openSubmitModal(${task.id})">📤 Nộp bài</button>
+                        <button class="submit-btn" onclick="openSubmitModal(${task.id})">?? N?p b�i</button>
                     </div>
                     ` : ''}
                     ${task.status !== 'completed' && task.status !== 'pending' ? `
@@ -966,7 +967,7 @@
             `).join('');
         }
 
-        // Mở modal nộp bài
+        // M? modal n?p b�i
         function openSubmitModal(id) {
             const task = tasksData.find(t => t.id === id);
             if (!task) return;
@@ -980,12 +981,12 @@
             document.getElementById('submitModal').classList.add('active');
         }
 
-        // Đóng modal nộp bài
+        // ��ng modal n?p b�i
         function closeSubmitModal() {
             document.getElementById('submitModal').classList.remove('active');
         }
 
-        // Lưu nộp bài
+        // Luu n?p b�i
         function saveSubmission(e) {
             e.preventDefault();
             const form = e.target;
@@ -998,7 +999,7 @@
             task.submissionLink = formData.get('submissionLink') || '';
             task.submissionNote = formData.get('submissionNote') || '';
             
-            // Nếu tick hoàn thành
+            // N?u tick ho�n th�nh
             if (document.getElementById('markCompleteCheck').checked) {
                 task.status = 'completed';
                 task.progress = 100;
@@ -1010,27 +1011,27 @@
             switchView(currentView);
             
             if (task.status === 'completed') {
-                alert('Đã nộp bài và đánh dấu hoàn thành! ✅');
+                alert('�� n?p b�i v� d�nh d?u ho�n th�nh! ?');
             } else {
-                alert('Đã nộp bài thành công! 📤');
+                alert('�� n?p b�i th�nh c�ng! ??');
             }
         }
 
-        // Mở modal thêm
+        // M? modal th�m
         function openAddModal() {
             editingId = null;
-            document.getElementById('modalTitle').textContent = 'Thêm công việc mới';
+            document.getElementById('modalTitle').textContent = 'Th�m c�ng vi?c m?i';
             document.getElementById('taskForm').reset();
             document.getElementById('taskModal').classList.add('active');
         }
 
-        // Sửa task
+        // S?a task
         function editTask(id) {
             const task = tasksData.find(t => t.id === id);
             if (!task) return;
 
             editingId = id;
-            document.getElementById('modalTitle').textContent = 'Sửa công việc';
+            document.getElementById('modalTitle').textContent = 'S?a c�ng vi?c';
             const form = document.getElementById('taskForm');
             
             form.group.value = task.group;
@@ -1052,9 +1053,9 @@
             document.getElementById('taskModal').classList.add('active');
         }
 
-        // Xóa task
+        // X�a task
         function deleteTask(id) {
-            if (confirm('Bạn có chắc muốn xóa công việc này?')) {
+            if (confirm('B?n c� ch?c mu?n x�a c�ng vi?c n�y?')) {
                 tasksData = tasksData.filter(t => t.id !== id);
                 saveToStorage();
                 updateStats();
@@ -1062,7 +1063,7 @@
             }
         }
 
-        // Lưu task
+        // Luu task
         function saveTask(e) {
             e.preventDefault();
             const form = e.target;
@@ -1084,7 +1085,7 @@
                 progress: parseInt(formData.get('progress')),
                 submissionLink: formData.get('submissionLink') || '',
                 submissionNote: formData.get('submissionNote') || '',
-                lastRecurDate: formData.get('frequency') === 'Hàng ngày' ? new Date().toISOString().split('T')[0] : null
+                lastRecurDate: formData.get('frequency') === 'H�ng ng�y' ? new Date().toISOString().split('T')[0] : null
             };
 
             if (editingId) {
@@ -1100,7 +1101,7 @@
             switchView(currentView);
         }
 
-        // Đổi trạng thái
+        // �?i tr?ng th�i
         function changeStatus(id) {
             const task = tasksData.find(t => t.id === id);
             if (!task) return;
@@ -1130,10 +1131,10 @@
 
         function getStatusText(status) {
             const statusMap = {
-                'completed': 'Hoàn thành',
-                'inprogress': 'Đang thực hiện',
-                'pending': 'Chưa bắt đầu',
-                'overdue': 'Quá hạn'
+                'completed': 'Ho�n th�nh',
+                'inprogress': '�ang th?c hi?n',
+                'pending': 'Chua b?t d?u',
+                'overdue': 'Qu� h?n'
             };
             return statusMap[status] || status;
         }
@@ -1165,15 +1166,15 @@
                 reader.onload = event => {
                     try {
                         const data = JSON.parse(event.target.result);
-                        if (confirm('Nhập dữ liệu sẽ ghi đè dữ liệu hiện tại. Tiếp tục?')) {
+                        if (confirm('Nh?p d? li?u s? ghi d� d? li?u hi?n t?i. Ti?p t?c?')) {
                             tasksData = data;
                             saveToStorage();
                             updateStats();
                             switchView('all');
-                            alert('Nhập dữ liệu thành công!');
+                            alert('Nh?p d? li?u th�nh c�ng!');
                         }
                     } catch (err) {
-                        alert('File không đúng định dạng!');
+                        alert('File kh�ng d�ng d?nh d?ng!');
                     }
                 };
                 reader.readAsText(file);
@@ -1197,27 +1198,27 @@
                         const rows = XLSX.utils.sheet_to_json(firstSheet);
                         
                         if (rows.length === 0) {
-                            alert('File Excel không có dữ liệu!');
+                            alert('File Excel kh�ng c� d? li?u!');
                             return;
                         }
                         
                         const convertedData = rows.map((row, index) => {
-                            // Linh hoạt xử lý trạng thái
+                            // Linh ho?t x? l� tr?ng th�i
                             let status = 'pending';
                             let progress = 0;
                             
-                            const statusText = (row['Trạng thái'] || row['Status'] || '').toString().toLowerCase();
-                            if (statusText.includes('hoàn thành') || statusText.includes('completed')) {
+                            const statusText = (row['Tr?ng th�i'] || row['Status'] || '').toString().toLowerCase();
+                            if (statusText.includes('ho�n th�nh') || statusText.includes('completed')) {
                                 status = 'completed';
                                 progress = 100;
-                            } else if (statusText.includes('đang') || statusText.includes('progress')) {
+                            } else if (statusText.includes('dang') || statusText.includes('progress')) {
                                 status = 'inprogress';
-                                progress = parseInt(row['Tiến độ %'] || row['Progress'] || 50);
+                                progress = parseInt(row['Ti?n d? %'] || row['Progress'] || 50);
                             }
                             
-                            // Xử lý deadline an toàn
+                            // X? l� deadline an to�n
                             let deadline = '';
-                            const deadlineValue = row['Deadline'] || row['Ngày deadline'] || row['Hạn chót'] || '';
+                            const deadlineValue = row['Deadline'] || row['Ng�y deadline'] || row['H?n ch�t'] || '';
                             if (deadlineValue) {
                                 try {
                                     if (typeof deadlineValue === 'number') {
@@ -1249,55 +1250,55 @@
                                         }
                                     }
                                 } catch (e) {
-                                    console.warn('Lỗi xử lý deadline:', e);
+                                    console.warn('L?i x? l� deadline:', e);
                                 }
                             }
                             
-                            // Nếu deadline không hợp lệ, dùng ngày hiện tại
+                            // N?u deadline kh�ng h?p l?, d�ng ng�y hi?n t?i
                             if (!deadline || deadline === 'NaN-NaN-NaN') {
                                 const today = new Date();
                                 deadline = today.toISOString().split('T')[0];
                             }
                             
-                            // Linh hoạt mapping các trường - bỏ qua các cột không liên quan
+                            // Linh ho?t mapping c�c tru?ng - b? qua c�c c?t kh�ng li�n quan
                             return {
                                 id: Date.now() + index + Math.random(),
-                                group: row['Nhóm việc'] || row['Group'] || row['Nhom viec'] || 'Chưa phân nhóm',
-                                program: row['Chương trình'] || row['Program'] || row['Chuong trinh'] || '',
-                                title: row['Công việc cụ thể'] || row['Công việc'] || row['Task'] || row['Title'] || row['Cong viec'] || 'Công việc ' + (index + 1),
-                                description: row['Mô tả'] || row['Description'] || row['Mo ta'] || row['Ghi chú'] || '',
-                                coordinator: row['Người điều phối'] || row['Coordinator'] || row['Nguoi dieu phoi'] || row['Điều phối'] || '',
-                                assignee: row['Người thực hiện'] || row['Assignee'] || row['Nguoi thuc hien'] || row['Thực hiện'] || 'Chưa phân công',
-                                approver: row['Người duyệt'] || row['Approver'] || row['Nguoi duyet'] || row['Duyệt'] || '',
+                                group: row['Nh�m vi?c'] || row['Group'] || row['Nhom viec'] || 'Chua ph�n nh�m',
+                                program: row['Chuong tr�nh'] || row['Program'] || row['Chuong trinh'] || '',
+                                title: row['C�ng vi?c c? th?'] || row['C�ng vi?c'] || row['Task'] || row['Title'] || row['Cong viec'] || 'C�ng vi?c ' + (index + 1),
+                                description: row['M� t?'] || row['Description'] || row['Mo ta'] || row['Ghi ch�'] || '',
+                                coordinator: row['Ngu?i di?u ph?i'] || row['Coordinator'] || row['Nguoi dieu phoi'] || row['�i?u ph?i'] || '',
+                                assignee: row['Ngu?i th?c hi?n'] || row['Assignee'] || row['Nguoi thuc hien'] || row['Th?c hi?n'] || 'Chua ph�n c�ng',
+                                approver: row['Ngu?i duy?t'] || row['Approver'] || row['Nguoi duyet'] || row['Duy?t'] || '',
                                 deadline: deadline,
-                                frequency: row['Tần suất'] || row['Frequency'] || row['Tan suat'] || 'Một lần',
-                                requiredOutput: row['Đầu ra bắt buộc'] || row['Required Output'] || row['Dau ra'] || row['Đầu ra'] || '',
+                                frequency: row['T?n su?t'] || row['Frequency'] || row['Tan suat'] || 'M?t l?n',
+                                requiredOutput: row['�?u ra b?t bu?c'] || row['Required Output'] || row['Dau ra'] || row['�?u ra'] || '',
                                 status: status,
                                 progress: progress,
                                 submissionLink: '',
                                 submissionNote: '',
                                 lastRecurDate: null
                             };
-                        }).filter(task => task.title && task.title !== '' && task.title !== 'Công việc NaN'); // Bỏ qua dòng trống
+                        }).filter(task => task.title && task.title !== '' && task.title !== 'C�ng vi?c NaN'); // B? qua d�ng tr?ng
                         
-                        if (confirm(`Tìm thấy ${convertedData.length} công việc. Nhập dữ liệu sẽ ghi đè dữ liệu hiện tại. Tiếp tục?`)) {
+                        if (confirm(`T�m th?y ${convertedData.length} c�ng vi?c. Nh?p d? li?u s? ghi d� d? li?u hi?n t?i. Ti?p t?c?`)) {
                             tasksData = convertedData;
                             saveToStorage();
                             updateStats();
                             switchView('all');
                             
-                            // Thông báo thành công không có alert lỗi
-                            const successMsg = `✅ Import thành công!\n\n` +
-                                             `📊 Tổng: ${convertedData.length} công việc\n` +
-                                             `✓ Hoàn thành: ${convertedData.filter(t => t.status === 'completed').length}\n` +
-                                             `⏳ Đang làm: ${convertedData.filter(t => t.status === 'inprogress').length}\n` +
-                                             `📋 Chưa bắt đầu: ${convertedData.filter(t => t.status === 'pending').length}`;
+                            // Th�ng b�o th�nh c�ng kh�ng c� alert l?i
+                            const successMsg = `? Import th�nh c�ng!\n\n` +
+                                             `?? T?ng: ${convertedData.length} c�ng vi?c\n` +
+                                             `? Ho�n th�nh: ${convertedData.filter(t => t.status === 'completed').length}\n` +
+                                             `? �ang l�m: ${convertedData.filter(t => t.status === 'inprogress').length}\n` +
+                                             `?? Chua b?t d?u: ${convertedData.filter(t => t.status === 'pending').length}`;
                             
                             alert(successMsg);
                         }
                     } catch (err) {
                         console.error('Excel import error:', err);
-                        alert('⚠️ Có lỗi khi đọc file Excel.\n\nVui lòng kiểm tra:\n- File có đúng định dạng .xlsx hoặc .xls\n- Có cột "Công việc cụ thể" hoặc "Task"\n- Dữ liệu bắt đầu từ dòng 2\n\nLỗi: ' + err.message);
+                        alert('?? C� l?i khi d?c file Excel.\n\nVui l�ng ki?m tra:\n- File c� d�ng d?nh d?ng .xlsx ho?c .xls\n- C� c?t "C�ng vi?c c? th?" ho?c "Task"\n- D? li?u b?t d?u t? d�ng 2\n\nL?i: ' + err.message);
                     }
                 };
                 reader.readAsArrayBuffer(file);
@@ -1305,7 +1306,7 @@
             input.click();
         }
 
-        // Đóng modal khi click ngoài
+        // ��ng modal khi click ngo�i
         document.getElementById('taskModal').addEventListener('click', (e) => {
             if (e.target.id === 'taskModal') closeModal();
         });
@@ -1314,11 +1315,26 @@
             if (e.target.id === 'submitModal') closeSubmitModal();
         });
 
-        // Khởi tạo
+        // Kh?i t?o
         loadData();
         updateStats();
         renderTasks(tasksData);
     </script>
+    <!-- Supabase Init -->
+    <script>
+        console.log('?? Kh?i t?o Supabase...');
+        const SUPABASE_URL = 'https://mtzkanuzjeaoejahwmmm.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10emthbnV6amVhb2VqYWh3bW1tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcwOTM1NjcsImV4cCI6MjEwMjY2OTU2N30.Darv0i4Tfabeqit_OERNxISrf9W-eqCYKABaFFitBBw';
+        
+        if (typeof window.supabase !== 'undefined') {
+            window.supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+            console.log('? Supabase d� s?n s�ng');
+        } else {
+            console.error('? Supabase library chua load');
+        }
+    </script>
+    <script src="dashboard-supabase.js"></script>
 </body>
 </html>
+
 
