@@ -86,9 +86,15 @@
                 <div id="existingFiles" style="display:none;margin-bottom:15px;"></div>
                 
                 <div class="form-group">
-                    <label>📎 Hoặc đính kèm file</label>
-                    <input type="file" name="submissionFile" accept="image/*,.pdf,.doc,.docx,.zip" multiple>
-                    <small style="color:#666;font-size:12px;">Ảnh, PDF, Word, ZIP</small>
+                    <label>📎 Đính kèm file</label>
+                    <div class="file-upload-area">
+                        <input type="file" id="fileInput" accept="image/*,.pdf,.doc,.docx,.xlsx,.xls,.zip,.rar" style="display:none;" onchange="app.handleFileSelect(event)" multiple>
+                        <button type="button" class="file-select-btn" onclick="document.getElementById('fileInput').click()">
+                            📁 Chọn file
+                        </button>
+                        <small style="color:#666;font-size:12px;display:block;margin-top:5px;">Ảnh, PDF, Word, Excel, ZIP</small>
+                    </div>
+                    <div id="selectedFiles" class="selected-files"></div>
                 </div>
                 
                 <div class="form-group">

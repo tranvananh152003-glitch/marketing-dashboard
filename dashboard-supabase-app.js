@@ -45,6 +45,7 @@ const app = {
     currentPerson: null,
     currentStatus: null,
     editingId: null,
+    selectedFiles: [], // Store selected files for upload
 
     // Load tasks from Supabase
     async loadTasks() {
@@ -449,10 +450,91 @@ const app = {
         form.taskId.value = id;
         form.submissionLink.value = '';
         form.submissionNote.value = '';
-        if (form.submissionFile) form.submissionFile.value = '';
         document.getElementById('markCompleteCheck').checked = false;
         document.getElementById('submitModalTitle').textContent = '📤 Nộp bài';
+        
+        // Reset selected files
+        this.selectedFiles = [];
+        document.getElementById('selectedFiles').innerHTML = '';
+        document.getElementById('fileInput').value = '';
+        document.getElementById('existingFiles').innerHTML = '';
+        document.getElementById('existingFiles').style.display = 'none';
+        
         document.getElementById('submitModal').classList.add('active');
+    },
+
+    // Handle file selection
+    handleFileSelect(event) {
+        const newFiles = Array.from(event.target.files);
+        
+        // Add new files to selectedFiles array
+        newFiles.forEach(file => {
+            // Check if file already exists
+            const exists = this.selectedFiles.some(f => f.name === file.name && f.size === file.size);
+            if (!exists) {
+                this.selectedFiles.push(file);
+            }
+        });
+        
+        // Clear file input
+        event.target.value = '';
+        
+        // Display selected files
+        this.displaySelectedFiles();
+    },
+
+    // Display selected files with remove buttons
+    displaySelectedFiles() {
+        const container = document.getElementById('selectedFiles');
+        
+        if (this.selectedFiles.length === 0) {
+            container.innerHTML = '';
+            return;
+        }
+        
+        container.innerHTML = `
+            <div style="font-weight:600;color:#666;margin:10px 0 8px 0;font-size:13px;">📎 File đã chọn (${this.selectedFiles.length}):</div>
+            ${this.selectedFiles.map((file, index) => `
+                <div class="file-preview-item">
+                    <div class="file-info">
+                        <span class="file-icon">${this.getFileIcon(file.name)}</span>
+                        <div class="file-details">
+                            <div class="file-name">${file.name}</div>
+                            <div class="file-size">${this.formatFileSize(file.size)}</div>
+                        </div>
+                    </div>
+                    <button type="button" class="remove-file-btn" onclick="app.removeSelectedFile(${index})">✕</button>
+                </div>
+            `).join('')}
+        `;
+    },
+
+    // Remove a file from selected files
+    removeSelectedFile(index) {
+        this.selectedFiles.splice(index, 1);
+        this.displaySelectedFiles();
+    },
+
+    // Get file icon based on extension
+    getFileIcon(filename) {
+        const ext = filename.split('.').pop().toLowerCase();
+        const icons = {
+            'pdf': '📄',
+            'doc': '📝', 'docx': '📝',
+            'xls': '📊', 'xlsx': '📊',
+            'jpg': '🖼️', 'jpeg': '🖼️', 'png': '🖼️', 'gif': '🖼️',
+            'zip': '📦', 'rar': '📦'
+        };
+        return icons[ext] || '📎';
+    },
+
+    // Format file size
+    formatFileSize(bytes) {
+        if (bytes === 0) return '0 B';
+        const k = 1024;
+        const sizes = ['B', 'KB', 'MB', 'GB'];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
     },
 
     // Edit submission
@@ -775,7 +857,7 @@ function startApp() {
         const taskId = parseInt(formData.get('taskId'));
         const link = formData.get('submissionLink') || '';
         const note = formData.get('submissionNote') || '';
-        const files = e.target.submissionFile?.files || [];
+        const files = app.selectedFiles; // Use selectedFiles instead
         const complete = document.getElementById('markCompleteCheck').checked;
         
         console.log({taskId, link, note, filesCount: files.length, complete});
