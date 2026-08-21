@@ -313,7 +313,13 @@ const app = {
                     
                     ${hasSubmission ? `
                         <div class="submission-section">
-                            <div class="submission-label">📤 Đã nộp bài</div>
+                            <div class="submission-label">
+                                📤 Đã nộp bài
+                                <div class="submission-actions">
+                                    <button class="submission-edit-btn" onclick="app.editSubmission(${task.id})">✏️ Sửa</button>
+                                    <button class="submission-delete-btn" onclick="app.deleteSubmission(${task.id})">🗑️ Xóa</button>
+                                </div>
+                            </div>
                             <div class="submission-content">
                                 ${task.submission_link ? `<a href="${task.submission_link}" target="_blank" class="submission-link">🔗 Link</a>` : ''}
                                 ${task.submission_note ? `<div class="submission-note">${task.submission_note}</div>` : ''}
@@ -448,7 +454,48 @@ const app = {
         form.submissionNote.value = '';
         if (form.submissionFile) form.submissionFile.value = '';
         document.getElementById('markCompleteCheck').checked = false;
+        document.getElementById('submitModalTitle').textContent = '📤 Nộp bài';
         document.getElementById('submitModal').classList.add('active');
+    },
+
+    // Edit submission
+    editSubmission(id) {
+        const task = this.tasks.find(t => t.id === id);
+        if (!task) return;
+        
+        const form = document.getElementById('submitForm');
+        form.taskId.value = id;
+        form.submissionLink.value = task.submission_link || '';
+        
+        // Extract text from HTML note
+        const tempDiv = document.createElement('div');
+        tempDiv.innerHTML = task.submission_note || '';
+        const textContent = tempDiv.textContent || tempDiv.innerText || '';
+        form.submissionNote.value = textContent;
+        
+        if (form.submissionFile) form.submissionFile.value = '';
+        document.getElementById('markCompleteCheck').checked = task.status === 'completed';
+        document.getElementById('submitModalTitle').textContent = '✏️ Chỉnh sửa bài nộp';
+        document.getElementById('submitModal').classList.add('active');
+    },
+
+    // Delete submission
+    async deleteSubmission(id) {
+        if (!confirm('Xóa bài nộp này?\n\nFile đã upload sẽ không bị xóa (vẫn lưu trong Storage).')) return;
+        
+        try {
+            await supabaseClient.from('tasks').update({
+                submission_link: null,
+                submission_note: null,
+                updated_at: new Date().toISOString()
+            }).eq('id', id);
+            
+            await this.loadTasks();
+            alert('✅ Đã xóa bài nộp!');
+        } catch (error) {
+            console.error('Delete submission error:', error);
+            alert('Lỗi xóa: ' + error.message);
+        }
     },
 
     // Close submit modal
@@ -651,6 +698,7 @@ function startApp() {
         }
         
         try {
+            const task = app.tasks.find(t => t.id === taskId);
             let finalNote = note;
             let uploadedFileUrls = [];
             
@@ -698,7 +746,12 @@ function startApp() {
                     `<a href="${f.url}" target="_blank">📎 ${f.name}</a>`
                 ).join(' | ');
                 
-                finalNote = (note ? note + '<br>' : '') + fileLinks;
+                // Nếu đang edit và đã có note cũ, thêm file mới vào
+                if (task.submission_note && task.submission_note.trim()) {
+                    finalNote = task.submission_note + '<br>' + fileLinks;
+                } else {
+                    finalNote = (note ? note + '<br>' : '') + fileLinks;
+                }
             }
             
             const updateData = {
@@ -721,7 +774,7 @@ function startApp() {
             app.closeSubmitModal();
             await app.loadTasks();
             
-            alert(complete ? '✅ Đã nộp & hoàn thành!' : '📤 Đã nộp bài!');
+            alert(complete ? '✅ Đã nộp & hoàn thành!' : '📤 Đã lưu bài nộp!');
         } catch (error) {
             console.error('❌ Submit error:', error);
             alert('Lỗi: ' + error.message);
