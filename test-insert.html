@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Insert</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: Arial; padding: 20px; max-width: 600px; }
+        button { padding: 12px 24px; margin: 10px 5px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; }
+        button:hover { background: #5568d3; }
+        #result { margin-top: 20px; padding: 20px; background: #f0f0f0; border-radius: 5px; white-space: pre-wrap; font-size: 13px; }
+        .success { background: #d1fae5; color: #065f46; }
+        .error { background: #fee2e2; color: #991b1b; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test Supabase Insert</h1>
+    <p>Kiểm tra kết nối và quyền insert vào database</p>
+    
+    <button onclick="testConnection()">1️⃣ Test Connection</button>
+    <button onclick="testInsert()">2️⃣ Test Insert 1 Record</button>
+    <button onclick="testInsertMultiple()">3️⃣ Test Insert 3 Records</button>
+    <button onclick="loadAll()">4️⃣ Load All Tasks</button>
+    <button onclick="deleteAll()" style="background:#ef4444;">5️⃣ Delete All</button>
+    
+    <div id="result">Nhấn nút để test...</div>
+    
+    <script>
+        const supabaseUrl = 'https://mtzkanuzjeaoejahwmmm.supabase.co';
+        const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10emthbnV6amVhb2VqYWh3bW1tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcwOTM1NjcsImV4cCI6MjEwMjY2OTU2N30.Darv0i4Tfabeqit_OERNxISrf9W-eqCYKABaFFitBBw';
+        
+        const supabase = window.supabase.createClient(supabaseUrl, supabaseKey);
+        
+        function showResult(text, isError = false) {
+            const div = document.getElementById('result');
+            div.textContent = text;
+            div.className = isError ? 'error' : 'success';
+        }
+        
+        async function testConnection() {
+            try {
+                showResult('⏳ Testing connection...');
+                const { data, error } = await supabase.from('tasks').select('count');
+                
+                if (error) throw error;
+                
+                showResult('✅ CONNECTION OK!\n\nSupabase đang kết nối thành công.');
+            } catch (error) {
+                showResult('❌ CONNECTION FAILED!\n\nError: ' + error.message + '\n\nDetails: ' + JSON.stringify(error, null, 2), true);
+            }
+        }
+        
+        async function testInsert() {
+            try {
+                showResult('⏳ Inserting 1 test task...');
+                
+                const testTask = {
+                    group: 'Test Group',
+                    program: 'Test Program',
+                    title: 'Test Task ' + new Date().toLocaleTimeString(),
+                    description: 'This is a test',
+                    coordinator: 'Test Coordinator',
+                    assignee: 'Test Assignee',
+                    approver: 'Test Approver',
+                    deadline: new Date().toISOString().split('T')[0],
+                    frequency: 'Một lần',
+                    status: 'pending',
+                    required_output: 'Test output',
+                    progress: 0,
+                    updated_at: new Date().toISOString()
+                };
+                
+                console.log('Inserting:', testTask);
+                
+                const { data, error } = await supabase
+                    .from('tasks')
+                    .insert([testTask])
+                    .select();
+                
+                if (error) throw error;
+                
+                showResult('✅ INSERT SUCCESSFUL!\n\nInserted task ID: ' + data[0].id + '\n\nData: ' + JSON.stringify(data[0], null, 2));
+            } catch (error) {
+                showResult('❌ INSERT FAILED!\n\nError: ' + error.message + '\n\nCode: ' + error.code + '\n\nHint: ' + error.hint + '\n\nDetails: ' + JSON.stringify(error, null, 2), true);
+            }
+        }
+        
+        async function testInsertMultiple() {
+            try {
+                showResult('⏳ Inserting 3 test tasks...');
+                
+                const tasks = [
+                    {
+                        group: 'Marketing Online',
+                        program: 'Social Media',
+                        title: 'Đăng bài Facebook',
+                        description: 'Đăng bài quảng cáo sản phẩm mới',
+                        coordinator: 'Nguyễn Văn A',
+                        assignee: 'Trần Thị B',
+                        approver: 'Lê Văn C',
+                        deadline: '2026-09-01',
+                        frequency: 'Hàng tuần',
+                        status: 'pending',
+                        required_output: '1 bài post + 3 ảnh',
+                        progress: 0,
+                        updated_at: new Date().toISOString()
+                    },
+                    {
+                        group: 'Marketing Offline',
+                        program: 'Sự kiện',
+                        title: 'Tổ chức workshop',
+                        description: 'Workshop về digital marketing',
+                        coordinator: 'Phạm Văn D',
+                        assignee: 'Hoàng Thị E',
+                        approver: 'Đỗ Văn F',
+                        deadline: '2026-09-15',
+                        frequency: 'Một lần',
+                        status: 'pending',
+                        required_output: 'Kế hoạch chi tiết',
+                        progress: 0,
+                        updated_at: new Date().toISOString()
+                    },
+                    {
+                        group: 'Content Marketing',
+                        program: 'Blog',
+                        title: 'Viết bài blog SEO',
+                        description: 'Bài viết về xu hướng marketing 2026',
+                        coordinator: 'Vũ Thị G',
+                        assignee: 'Ngô Văn H',
+                        approver: 'Bùi Thị I',
+                        deadline: '2026-09-10',
+                        frequency: 'Hàng tháng',
+                        status: 'inprogress',
+                        required_output: '1 bài 2000 từ',
+                        progress: 30,
+                        updated_at: new Date().toISOString()
+                    }
+                ];
+                
+                const { data, error } = await supabase
+                    .from('tasks')
+                    .insert(tasks)
+                    .select();
+                
+                if (error) throw error;
+                
+                showResult('✅ INSERT MULTIPLE SUCCESSFUL!\n\nInserted ' + data.length + ' tasks\nIDs: ' + data.map(t => t.id).join(', '));
+            } catch (error) {
+                showResult('❌ INSERT FAILED!\n\nError: ' + error.message + '\n\nDetails: ' + JSON.stringify(error, null, 2), true);
+            }
+        }
+        
+        async function loadAll() {
+            try {
+                showResult('⏳ Loading all tasks...');
+                
+                const { data, error } = await supabase
+                    .from('tasks')
+                    .select('*')
+                    .order('id', { ascending: false });
+                
+                if (error) throw error;
+                
+                if (data.length === 0) {
+                    showResult('📭 NO TASKS FOUND\n\nDatabase is empty.');
+                    return;
+                }
+                
+                const summary = data.map((t, i) => 
+                    `${i+1}. [ID:${t.id}] ${t.title} - ${t.assignee} - ${t.status}`
+                ).join('\n');
+                
+                showResult('✅ FOUND ' + data.length + ' TASKS\n\n' + summary);
+            } catch (error) {
+                showResult('❌ LOAD FAILED!\n\nError: ' + error.message, true);
+            }
+        }
+        
+        async function deleteAll() {
+            if (!confirm('⚠️ XÓA TẤT CẢ công việc?\n\nHành động này KHÔNG THỂ HOÀN TÁC!')) return;
+            if (!confirm('Bạn CHẮC CHẮN 100% chứ?')) return;
+            
+            try {
+                showResult('⏳ Deleting all tasks...');
+                
+                const { error } = await supabase
+                    .from('tasks')
+                    .delete()
+                    .gte('id', 0);
+                
+                if (error) throw error;
+                
+                showResult('✅ ALL TASKS DELETED!');
+            } catch (error) {
+                showResult('❌ DELETE FAILED!\n\nError: ' + error.message + '\n\nDetails: ' + JSON.stringify(error, null, 2), true);
+            }
+        }
+    </script>
+</body>
+</html>

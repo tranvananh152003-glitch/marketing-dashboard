@@ -408,35 +408,57 @@ const app = {
             const reader = new FileReader();
             reader.onload = async (event) => {
                 try {
+                    console.log('📊 Starting Excel import...');
                     const data = new Uint8Array(event.target.result);
                     const workbook = XLSX.read(data, { type: 'array' });
                     const sheet = workbook.Sheets[workbook.SheetNames[0]];
                     const rows = XLSX.utils.sheet_to_json(sheet);
                     
+                    console.log(`Found ${rows.length} rows in Excel`);
+                    
+                    const tasksToInsert = [];
+                    
                     for (const row of rows) {
                         const taskData = {
-                            group: row['Nhóm việc'] || '',
-                            program: row['Chương trình'] || '',
-                            title: row['Công việc'] || '',
-                            description: row['Mô tả'] || '',
-                            coordinator: row['Người điều phối'] || '',
-                            assignee: row['Người thực hiện'] || '',
-                            approver: row['Người duyệt'] || '',
-                            deadline: row['Deadline'] || new Date().toISOString().split('T')[0],
-                            frequency: row['Tần suất'] || 'Một lần',
+                            group: String(row['Nhóm việc'] || '').trim(),
+                            program: String(row['Chương trình'] || '').trim(),
+                            title: String(row['Công việc'] || '').trim(),
+                            description: String(row['Mô tả'] || '').trim(),
+                            coordinator: String(row['Người điều phối'] || '').trim(),
+                            assignee: String(row['Người thực hiện'] || '').trim(),
+                            approver: String(row['Người duyệt'] || '').trim(),
+                            deadline: String(row['Deadline'] || new Date().toISOString().split('T')[0]),
+                            frequency: String(row['Tần suất'] || 'Một lần'),
                             status: 'pending',
-                            required_output: row['Đầu ra'] || '',
+                            required_output: String(row['Đầu ra'] || '').trim(),
                             progress: 0,
                             updated_at: new Date().toISOString()
                         };
                         
-                        await supabaseClient.from('tasks').insert([taskData]);
+                        tasksToInsert.push(taskData);
                     }
                     
+                    console.log('Inserting tasks to Supabase...');
+                    
+                    // Insert tất cả cùng lúc thay vì từng cái
+                    const { data: insertedData, error } = await supabaseClient
+                        .from('tasks')
+                        .insert(tasksToInsert)
+                        .select();
+                    
+                    if (error) {
+                        console.error('Supabase insert error:', error);
+                        throw error;
+                    }
+                    
+                    console.log('✅ Inserted successfully:', insertedData);
+                    
+                    // Reload tasks
                     await this.loadTasks();
-                    alert(`✅ Đã import ${rows.length} công việc!`);
+                    
+                    alert(`✅ Đã import ${tasksToInsert.length} công việc!`);
                 } catch (error) {
-                    console.error('Import error:', error);
+                    console.error('❌ Import error:', error);
                     alert('Lỗi import: ' + error.message);
                 }
             };

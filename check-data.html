@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Check Supabase Data</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: Arial; padding: 20px; }
+        button { padding: 10px 20px; margin: 10px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer; }
+        #result { margin-top: 20px; padding: 20px; background: #f0f0f0; border-radius: 5px; white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+    <h1>🔍 Kiểm tra dữ liệu Supabase</h1>
+    <button onclick="checkCount()">Đếm số công việc</button>
+    <button onclick="loadAll()">Xem tất cả</button>
+    <button onclick="deleteAll()">⚠️ XÓA TẤT CẢ</button>
+    <div id="result">Chưa có dữ liệu...</div>
+    
+    <script>
+        const supabase = window.supabase.createClient(
+            'https://mtzkanuzjeaoejahwmmm.supabase.co',
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10emthbnV6amVhb2VqYWh3bW1tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcwOTM1NjcsImV4cCI6MjEwMjY2OTU2N30.Darv0i4Tfabeqit_OERNxISrf9W-eqCYKABaFFitBBw'
+        );
+        
+        async function checkCount() {
+            try {
+                const { count, error } = await supabase
+                    .from('tasks')
+                    .select('*', { count: 'exact', head: true });
+                    
+                if (error) throw error;
+                document.getElementById('result').textContent = `✅ Có ${count} công việc trong database`;
+            } catch (error) {
+                document.getElementById('result').textContent = '❌ Lỗi: ' + error.message;
+            }
+        }
+        
+        async function loadAll() {
+            try {
+                const { data, error } = await supabase
+                    .from('tasks')
+                    .select('*')
+                    .order('id', { ascending: true });
+                    
+                if (error) throw error;
+                
+                document.getElementById('result').textContent = 
+                    `✅ Có ${data.length} công việc:\n\n` +
+                    data.map((t, i) => `${i+1}. ${t.title} - ${t.assignee} - ${t.status}`).join('\n');
+            } catch (error) {
+                document.getElementById('result').textContent = '❌ Lỗi: ' + error.message;
+            }
+        }
+        
+        async function deleteAll() {
+            if (!confirm('XÓA TẤT CẢ công việc? Không thể hoàn tác!')) return;
+            if (!confirm('Bạn CHẮC CHẮN chứ?')) return;
+            
+            try {
+                const { error } = await supabase
+                    .from('tasks')
+                    .delete()
+                    .neq('id', 0); // Delete all where id != 0 (meaning all)
+                    
+                if (error) throw error;
+                document.getElementById('result').textContent = '✅ Đã xóa tất cả!';
+            } catch (error) {
+                document.getElementById('result').textContent = '❌ Lỗi: ' + error.message;
+            }
+        }
+    </script>
+</body>
+</html>
