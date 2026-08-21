@@ -493,19 +493,30 @@ const app = {
         }
         
         container.innerHTML = `
-            <div style="font-weight:600;color:#666;margin:10px 0 8px 0;font-size:13px;">📎 File đã chọn (${this.selectedFiles.length}):</div>
-            ${this.selectedFiles.map((file, index) => `
-                <div class="file-preview-item">
-                    <div class="file-info">
-                        <span class="file-icon">${this.getFileIcon(file.name)}</span>
-                        <div class="file-details">
-                            <div class="file-name">${file.name}</div>
-                            <div class="file-size">${this.formatFileSize(file.size)}</div>
+            <div style="font-weight:600;color:#666;margin:10px 0 8px 0;font-size:13px;">
+                📎 File đã chọn (${this.selectedFiles.length}):
+            </div>
+            ${this.selectedFiles.map((file, index) => {
+                const isExisting = file.isExisting;
+                const fileName = file.name;
+                const fileSize = isExisting ? '' : this.formatFileSize(file.size);
+                
+                return `
+                    <div class="file-preview-item ${isExisting ? 'existing-file' : ''}">
+                        <div class="file-info">
+                            <span class="file-icon">${this.getFileIcon(fileName)}</span>
+                            <div class="file-details">
+                                <div class="file-name">
+                                    ${isExisting ? `<a href="${file.url}" target="_blank" style="color:#0891b2;text-decoration:none;">${fileName}</a>` : fileName}
+                                </div>
+                                ${fileSize ? `<div class="file-size">${fileSize}</div>` : ''}
+                                ${isExisting ? '<div class="file-size" style="color:#059669;">✓ Đã upload</div>' : ''}
+                            </div>
                         </div>
+                        <button type="button" class="remove-file-btn" onclick="app.removeSelectedFile(${index})">✕</button>
                     </div>
-                    <button type="button" class="remove-file-btn" onclick="app.removeSelectedFile(${index})">✕</button>
-                </div>
-            `).join('')}
+                `;
+            }).join('')}
         `;
     },
 
@@ -550,11 +561,12 @@ const app = {
         const tempDiv = document.createElement('div');
         tempDiv.innerHTML = task.submission_note || '';
         
-        // Extract file links
+        // Extract file links and add to selectedFiles as "existing"
         const fileLinks = Array.from(tempDiv.querySelectorAll('a'));
-        const files = fileLinks.map(link => ({
+        this.selectedFiles = fileLinks.map(link => ({
             name: link.textContent.replace('📎 ', ''),
-            url: link.href
+            url: link.href,
+            isExisting: true // Mark as existing file
         }));
         
         // Extract plain text (excluding file links)
@@ -565,11 +577,11 @@ const app = {
             .trim();
         
         form.submissionNote.value = textContent;
-        if (form.submissionFile) form.submissionFile.value = '';
         document.getElementById('markCompleteCheck').checked = task.status === 'completed';
+        document.getElementById('fileInput').value = '';
         
-        // Display existing files
-        this.displayExistingFiles(id, files);
+        // Display files using same displaySelectedFiles
+        this.displaySelectedFiles();
         
         document.getElementById('submitModalTitle').textContent = '✏️ Chỉnh sửa bài nộp';
         document.getElementById('submitModal').classList.add('active');
@@ -874,9 +886,19 @@ function startApp() {
             
             // Upload files to Supabase Storage
             if (files.length > 0) {
-                console.log('📤 Uploading files...');
+                console.log('📤 Processing files...');
                 
                 for (let file of files) {
+                    // Skip existing files (already uploaded)
+                    if (file.isExisting) {
+                        uploadedFileUrls.push({
+                            name: file.name,
+                            url: file.url
+                        });
+                        continue;
+                    }
+                    
+                    // Upload new files
                     // Sanitize filename: remove Vietnamese accents and special chars
                     let sanitizedName = file.name
                         .normalize('NFD')
