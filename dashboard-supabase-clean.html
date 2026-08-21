@@ -23,22 +23,22 @@
         </header>
 
         <div class="stats-grid">
-            <div class="stat-card completed">
+            <div class="stat-card completed" id="completedCard" onclick="app.filterByStatus('completed')" style="cursor:pointer;">
                 <div class="stat-icon">✅</div>
                 <div class="stat-value" id="completedTasks">-</div>
                 <div class="stat-label">Hoàn thành</div>
             </div>
-            <div class="stat-card progress">
+            <div class="stat-card progress" id="inprogressCard" onclick="app.filterByStatus('inprogress')" style="cursor:pointer;">
                 <div class="stat-icon">⏳</div>
                 <div class="stat-value" id="inProgressTasks">-</div>
                 <div class="stat-label">Đang thực hiện</div>
             </div>
-            <div class="stat-card pending">
+            <div class="stat-card pending" id="pendingCard" onclick="app.filterByStatus('pending')" style="cursor:pointer;">
                 <div class="stat-icon">📋</div>
                 <div class="stat-value" id="pendingTasks">-</div>
                 <div class="stat-label">Chưa bắt đầu</div>
             </div>
-            <div class="stat-card overdue">
+            <div class="stat-card overdue" id="overdueCard" onclick="app.filterByStatus('overdue')" style="cursor:pointer;">
                 <div class="stat-icon">⚠️</div>
                 <div class="stat-value" id="overdueTasks">-</div>
                 <div class="stat-label">Quá hạn</div>

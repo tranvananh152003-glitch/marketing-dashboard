@@ -43,6 +43,7 @@ const app = {
     currentView: 'all',
     currentGroup: null,
     currentPerson: null,
+    currentStatus: null,
     editingId: null,
 
     // Load tasks from Supabase
@@ -120,10 +121,14 @@ const app = {
         this.currentView = view;
         this.currentGroup = null;
         this.currentPerson = null;
+        this.currentStatus = null;
         
         // Update active tab
         document.querySelectorAll('.view-tab').forEach(tab => tab.classList.remove('active'));
         event?.target?.classList.add('active');
+        
+        // Remove active status from stat cards
+        document.querySelectorAll('.stat-card').forEach(card => card.classList.remove('active-filter'));
         
         document.getElementById('groupTabs').style.display = 'none';
         document.getElementById('personTabs').style.display = 'none';
@@ -135,6 +140,36 @@ const app = {
         } else if (view === 'people') {
             this.renderPersonTabs();
         }
+    },
+
+    // Filter by status
+    filterByStatus(status) {
+        this.currentStatus = status;
+        this.currentView = 'status';
+        this.currentGroup = null;
+        this.currentPerson = null;
+        
+        // Update UI
+        document.querySelectorAll('.view-tab').forEach(tab => tab.classList.remove('active'));
+        document.querySelectorAll('.stat-card').forEach(card => card.classList.remove('active-filter'));
+        document.getElementById('groupTabs').style.display = 'none';
+        document.getElementById('personTabs').style.display = 'none';
+        
+        // Highlight selected stat card
+        const statusMap = {
+            'completed': 'completedCard',
+            'inprogress': 'inprogressCard',
+            'pending': 'pendingCard',
+            'overdue': 'overdueCard'
+        };
+        const cardId = statusMap[status];
+        if (cardId) {
+            document.getElementById(cardId)?.classList.add('active-filter');
+        }
+        
+        // Filter and render
+        const filtered = this.tasks.filter(t => t.status === status);
+        this.renderTasks(filtered);
     },
 
     // Render group tabs
@@ -213,6 +248,8 @@ const app = {
     renderView() {
         if (this.currentView === 'all') {
             this.renderTasks(this.tasks);
+        } else if (this.currentView === 'status' && this.currentStatus) {
+            this.renderTasks(this.tasks.filter(t => t.status === this.currentStatus));
         } else if (this.currentView === 'group' && this.currentGroup) {
             this.renderTasks(this.tasks.filter(t => t.group === this.currentGroup));
         } else if (this.currentView === 'people' && this.currentPerson) {

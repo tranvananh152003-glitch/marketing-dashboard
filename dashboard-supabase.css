@@ -57,6 +57,18 @@ header h1 { color: #333; font-size: 28px; margin-bottom: 10px; }
     border-radius: 15px;
     box-shadow: 0 5px 20px rgba(0,0,0,0.1); 
     text-align: center;
+    transition: all 0.3s;
+}
+
+.stat-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0,0,0,0.15);
+}
+
+.stat-card.active-filter {
+    border: 3px solid #667eea;
+    box-shadow: 0 8px 30px rgba(102, 126, 234, 0.4);
+    transform: scale(1.05);
 }
 
 .stat-icon { font-size: 36px; margin-bottom: 10px; }
