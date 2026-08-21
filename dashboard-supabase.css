@@ -506,3 +506,85 @@ header h1 { color: #333; font-size: 28px; margin-bottom: 10px; }
         grid-template-columns: 1fr;
     }
 }
+
+/* Existing Files Display */
+#existingFiles {
+    background: #f9fafb;
+    padding: 15px;
+    border-radius: 8px;
+    border: 1px solid #e5e7eb;
+}
+
+.existing-file-item {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 12px;
+    background: white;
+    border-radius: 6px;
+    margin-bottom: 8px;
+    border: 1px solid #e5e7eb;
+}
+
+.existing-file-item:last-child {
+    margin-bottom: 0;
+}
+
+.existing-file-link {
+    color: #0891b2;
+    text-decoration: none;
+    font-size: 13px;
+    flex: 1;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.existing-file-link:hover {
+    text-decoration: underline;
+}
+
+.delete-file-btn {
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    border: none;
+    background: #ef4444;
+    color: white;
+    cursor: pointer;
+    font-size: 14px;
+    line-height: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s;
+    flex-shrink: 0;
+    margin-left: 10px;
+}
+
+.delete-file-btn:hover {
+    background: #dc2626;
+    transform: scale(1.1);
+}
+
+.submission-label {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.submission-edit-btn {
+    padding: 4px 12px;
+    border: none;
+    border-radius: 5px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+    font-weight: 500;
+    background: #3b82f6;
+    color: white;
+}
+
+.submission-edit-btn:hover {
+    background: #2563eb;
+}

@@ -315,10 +315,7 @@ const app = {
                         <div class="submission-section">
                             <div class="submission-label">
                                 📤 Đã nộp bài
-                                <div class="submission-actions">
-                                    <button class="submission-edit-btn" onclick="app.editSubmission(${task.id})">✏️ Sửa</button>
-                                    <button class="submission-delete-btn" onclick="app.deleteSubmission(${task.id})">🗑️ Xóa</button>
-                                </div>
+                                <button class="submission-edit-btn" onclick="app.editSubmission(${task.id})">✏️ Sửa</button>
                             </div>
                             <div class="submission-content">
                                 ${task.submission_link ? `<a href="${task.submission_link}" target="_blank" class="submission-link">🔗 Link</a>` : ''}
@@ -467,16 +464,107 @@ const app = {
         form.taskId.value = id;
         form.submissionLink.value = task.submission_link || '';
         
-        // Extract text from HTML note
+        // Parse files from HTML note
         const tempDiv = document.createElement('div');
         tempDiv.innerHTML = task.submission_note || '';
-        const textContent = tempDiv.textContent || tempDiv.innerText || '';
-        form.submissionNote.value = textContent;
         
+        // Extract file links
+        const fileLinks = Array.from(tempDiv.querySelectorAll('a'));
+        const files = fileLinks.map(link => ({
+            name: link.textContent.replace('📎 ', ''),
+            url: link.href
+        }));
+        
+        // Extract plain text (excluding file links)
+        const textContent = Array.from(tempDiv.childNodes)
+            .filter(node => node.nodeType === Node.TEXT_NODE || (node.nodeName === 'BR'))
+            .map(node => node.textContent)
+            .join('')
+            .trim();
+        
+        form.submissionNote.value = textContent;
         if (form.submissionFile) form.submissionFile.value = '';
         document.getElementById('markCompleteCheck').checked = task.status === 'completed';
+        
+        // Display existing files
+        this.displayExistingFiles(id, files);
+        
         document.getElementById('submitModalTitle').textContent = '✏️ Chỉnh sửa bài nộp';
         document.getElementById('submitModal').classList.add('active');
+    },
+
+    // Display existing files with delete buttons
+    displayExistingFiles(taskId, files) {
+        const container = document.getElementById('existingFiles');
+        if (!container) return;
+        
+        if (files.length === 0) {
+            container.innerHTML = '';
+            container.style.display = 'none';
+            return;
+        }
+        
+        container.style.display = 'block';
+        container.innerHTML = `
+            <div style="font-weight:600;color:#666;margin-bottom:10px;font-size:13px;">📎 File đã upload:</div>
+            ${files.map((file, index) => `
+                <div class="existing-file-item">
+                    <a href="${file.url}" target="_blank" class="existing-file-link">📄 ${file.name}</a>
+                    <button type="button" class="delete-file-btn" onclick="app.deleteFile(${taskId}, '${file.url.replace(/'/g, "\\'")}', ${index})">✕</button>
+                </div>
+            `).join('')}
+        `;
+    },
+
+    // Delete a specific file from submission
+    async deleteFile(taskId, fileUrl, index) {
+        const task = this.tasks.find(t => t.id === taskId);
+        if (!task) return;
+        
+        if (!confirm('Xóa file này?')) return;
+        
+        try {
+            // Parse current note
+            const tempDiv = document.createElement('div');
+            tempDiv.innerHTML = task.submission_note || '';
+            
+            // Remove the specific link
+            const links = tempDiv.querySelectorAll('a');
+            if (links[index]) {
+                const parent = links[index].parentNode;
+                links[index].remove();
+                
+                // Clean up separators
+                if (parent.textContent.trim() === '|') {
+                    parent.textContent = '';
+                }
+            }
+            
+            // Get updated HTML
+            let updatedNote = tempDiv.innerHTML.trim()
+                .replace(/\|\s*\|/g, '|') // Remove double separators
+                .replace(/^\s*\|\s*/g, '') // Remove leading separator
+                .replace(/\s*\|\s*$/g, ''); // Remove trailing separator
+            
+            if (!updatedNote || updatedNote === '<br>') {
+                updatedNote = null;
+            }
+            
+            // Update database
+            await supabaseClient.from('tasks').update({
+                submission_note: updatedNote,
+                updated_at: new Date().toISOString()
+            }).eq('id', taskId);
+            
+            await this.loadTasks();
+            
+            // Refresh the edit modal
+            this.editSubmission(taskId);
+            
+        } catch (error) {
+            console.error('Delete file error:', error);
+            alert('Lỗi xóa file: ' + error.message);
+        }
     },
 
     // Delete submission
