@@ -58,7 +58,7 @@ const app = {
             const { data, error } = await supabaseClient
                 .from('tasks')
                 .select('*')
-                .order('updated_at', { ascending: false });
+                .order('updated_at', { ascending: false }); // Mới nhất lên đầu
             
             if (error) {
                 console.error('Supabase query error:', error);
@@ -315,8 +315,8 @@ const app = {
                         <div class="submission-section">
                             <div class="submission-label">📤 Đã nộp bài</div>
                             <div class="submission-content">
-                                ${task.submission_link ? `<a href="${task.submission_link}" target="_blank" class="submission-link">🔗 ${task.submission_link}</a>` : ''}
-                                ${task.submission_note ? `<span class="submission-file">📄 ${task.submission_note}</span>` : ''}
+                                ${task.submission_link ? `<a href="${task.submission_link}" target="_blank" class="submission-link">🔗 Link</a>` : ''}
+                                ${task.submission_note ? `<div class="submission-note">${task.submission_note}</div>` : ''}
                             </div>
                         </div>
                     ` : `
@@ -652,9 +652,53 @@ function startApp() {
         
         try {
             let finalNote = note;
+            let uploadedFileUrls = [];
+            
+            // Upload files to Supabase Storage
             if (files.length > 0) {
-                const fileNames = Array.from(files).map(f => f.name).join(', ');
-                finalNote = (note ? note + ' | ' : '') + `📎 ${fileNames}`;
+                console.log('📤 Uploading files...');
+                
+                for (let file of files) {
+                    const fileName = `${Date.now()}_${file.name}`;
+                    const filePath = `submissions/${fileName}`;
+                    
+                    const { data: uploadData, error: uploadError } = await supabaseClient
+                        .storage
+                        .from('task-files')
+                        .upload(filePath, file, {
+                            cacheControl: '3600',
+                            upsert: false
+                        });
+                    
+                    if (uploadError) {
+                        console.error('Upload error:', uploadError);
+                        
+                        // Nếu bucket không tồn tại, tạo bucket mới
+                        if (uploadError.message.includes('not found')) {
+                            alert('⚠️ Cần setup Storage trong Supabase:\n\n1. Vào Supabase Dashboard\n2. Storage → Create bucket\n3. Tên: task-files\n4. Public: Yes\n\nHoặc chỉ nhập link/ghi chú (không upload file)');
+                            return;
+                        }
+                        throw uploadError;
+                    }
+                    
+                    // Get public URL
+                    const { data: urlData } = supabaseClient
+                        .storage
+                        .from('task-files')
+                        .getPublicUrl(filePath);
+                    
+                    uploadedFileUrls.push({
+                        name: file.name,
+                        url: urlData.publicUrl
+                    });
+                }
+                
+                // Add file info to note
+                const fileLinks = uploadedFileUrls.map(f => 
+                    `<a href="${f.url}" target="_blank">📎 ${f.name}</a>`
+                ).join(' | ');
+                
+                finalNote = (note ? note + '<br>' : '') + fileLinks;
             }
             
             const updateData = {

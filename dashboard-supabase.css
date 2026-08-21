@@ -271,11 +271,30 @@ header h1 { color: #333; font-size: 28px; margin-bottom: 10px; }
     font-size: 12px;
     color: #0891b2;
     word-break: break-all;
+    text-decoration: none;
+    padding: 4px 8px;
+    background: white;
+    border-radius: 4px;
 }
 
-.submission-file {
+.submission-link:hover {
+    text-decoration: underline;
+}
+
+.submission-note {
     font-size: 12px;
     color: #059669;
+    line-height: 1.5;
+}
+
+.submission-note a {
+    color: #0891b2;
+    text-decoration: none;
+    margin-right: 8px;
+}
+
+.submission-note a:hover {
+    text-decoration: underline;
 }
 
 .submit-btn {
