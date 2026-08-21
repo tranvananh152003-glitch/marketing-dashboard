@@ -1,0 +1,309 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Import Excel vào Supabase</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .container {
+            background: white;
+            padding: 40px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 600px;
+            width: 100%;
+        }
+        h1 {
+            color: #333;
+            margin-bottom: 10px;
+            font-size: 28px;
+        }
+        .subtitle {
+            color: #666;
+            margin-bottom: 30px;
+            font-size: 14px;
+        }
+        .step {
+            background: #f8f9fa;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            border-left: 4px solid #667eea;
+        }
+        .step-title {
+            font-weight: 600;
+            color: #667eea;
+            margin-bottom: 10px;
+            font-size: 16px;
+        }
+        .file-input-wrapper {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+            width: 100%;
+        }
+        .file-input-wrapper input[type=file] {
+            position: absolute;
+            left: -9999px;
+        }
+        .file-input-label {
+            display: block;
+            padding: 15px 30px;
+            background: #667eea;
+            color: white;
+            text-align: center;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s;
+            font-size: 16px;
+        }
+        .file-input-label:hover {
+            background: #5568d3;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(102, 126, 234, 0.4);
+        }
+        .file-name {
+            margin-top: 10px;
+            color: #059669;
+            font-weight: 500;
+            font-size: 14px;
+        }
+        .button {
+            padding: 15px 30px;
+            background: #10b981;
+            color: white;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 16px;
+            width: 100%;
+            transition: all 0.3s;
+            margin-top: 10px;
+        }
+        .button:hover {
+            background: #059669;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(16, 185, 129, 0.4);
+        }
+        .button:disabled {
+            background: #d1d5db;
+            cursor: not-allowed;
+            transform: none;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 20px;
+            border-radius: 10px;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        .success {
+            background: #d1fae5;
+            color: #065f46;
+            border-left: 4px solid #10b981;
+        }
+        .error {
+            background: #fee2e2;
+            color: #991b1b;
+            border-left: 4px solid #ef4444;
+        }
+        .info {
+            background: #dbeafe;
+            color: #1e40af;
+            border-left: 4px solid #3b82f6;
+        }
+        .loading {
+            text-align: center;
+            color: #667eea;
+            font-weight: 600;
+        }
+        .format-example {
+            background: #fff;
+            padding: 15px;
+            border-radius: 8px;
+            margin-top: 10px;
+            font-size: 13px;
+            border: 1px solid #e5e7eb;
+        }
+        .format-example pre {
+            overflow-x: auto;
+            color: #374151;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>📊 Import Excel vào Database</h1>
+        <p class="subtitle">Upload file Excel để import công việc vào Supabase</p>
+
+        <div class="step">
+            <div class="step-title">📋 Bước 1: Chuẩn bị file Excel</div>
+            <p style="color:#666;font-size:14px;margin-bottom:10px;">File Excel cần có các cột sau (đúng tên):</p>
+            <div class="format-example">
+                <pre>Nhóm việc | Chương trình | Công việc | Mô tả | Người điều phối | Người thực hiện | Người duyệt | Deadline | Tần suất | Đầu ra</pre>
+            </div>
+        </div>
+
+        <div class="step">
+            <div class="step-title">📁 Bước 2: Chọn file Excel</div>
+            <div class="file-input-wrapper">
+                <input type="file" id="fileInput" accept=".xlsx,.xls" onchange="handleFileSelect(event)">
+                <label for="fileInput" class="file-input-label">
+                    📂 Chọn file Excel (.xlsx, .xls)
+                </label>
+            </div>
+            <div id="fileName" class="file-name" style="display:none;"></div>
+        </div>
+
+        <div class="step">
+            <div class="step-title">🚀 Bước 3: Upload</div>
+            <button class="button" id="uploadBtn" onclick="uploadToSupabase()" disabled>
+                Upload vào Database
+            </button>
+        </div>
+
+        <div id="result"></div>
+    </div>
+
+    <script>
+        const supabase = window.supabase.createClient(
+            'https://mtzkanuzjeaoejahwmmm.supabase.co',
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10emthbnV6amVhb2VqYWh3bW1tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcwOTM1NjcsImV4cCI6MjEwMjY2OTU2N30.Darv0i4Tfabeqit_OERNxISrf9W-eqCYKABaFFitBBw'
+        );
+
+        let parsedData = [];
+
+        function handleFileSelect(event) {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            document.getElementById('fileName').textContent = '✅ ' + file.name;
+            document.getElementById('fileName').style.display = 'block';
+
+            const reader = new FileReader();
+            reader.onload = function(e) {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array' });
+                    const sheet = workbook.Sheets[workbook.SheetNames[0]];
+                    const rows = XLSX.utils.sheet_to_json(sheet);
+
+                    console.log('Parsed rows:', rows);
+
+                    if (rows.length === 0) {
+                        showResult('❌ File Excel rỗng hoặc không đúng định dạng!', 'error');
+                        return;
+                    }
+
+                    parsedData = rows.map(row => ({
+                        group: String(row['Nhóm việc'] || '').trim(),
+                        program: String(row['Chương trình'] || '').trim(),
+                        title: String(row['Công việc'] || '').trim(),
+                        description: String(row['Mô tả'] || '').trim(),
+                        coordinator: String(row['Người điều phối'] || '').trim(),
+                        assignee: String(row['Người thực hiện'] || '').trim(),
+                        approver: String(row['Người duyệt'] || '').trim(),
+                        deadline: String(row['Deadline'] || new Date().toISOString().split('T')[0]),
+                        frequency: String(row['Tần suất'] || 'Một lần'),
+                        status: 'pending',
+                        required_output: String(row['Đầu ra'] || '').trim(),
+                        progress: 0,
+                        updated_at: new Date().toISOString()
+                    }));
+
+                    console.log('Processed data:', parsedData);
+
+                    showResult(`✅ Đã đọc ${parsedData.length} công việc từ Excel!\n\nSẵn sàng upload vào database.`, 'success');
+                    document.getElementById('uploadBtn').disabled = false;
+
+                } catch (error) {
+                    console.error('Parse error:', error);
+                    showResult('❌ Lỗi đọc file Excel: ' + error.message, 'error');
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        async function uploadToSupabase() {
+            if (parsedData.length === 0) {
+                showResult('❌ Chưa có dữ liệu để upload!', 'error');
+                return;
+            }
+
+            showResult('⏳ Đang upload ' + parsedData.length + ' công việc...', 'loading');
+            document.getElementById('uploadBtn').disabled = true;
+
+            try {
+                console.log('Inserting to Supabase:', parsedData);
+
+                const { data, error } = await supabase
+                    .from('tasks')
+                    .insert(parsedData)
+                    .select();
+
+                if (error) {
+                    console.error('Supabase error:', error);
+                    throw error;
+                }
+
+                console.log('Insert successful:', data);
+
+                showResult(
+                    `✅ THÀNH CÔNG!\n\n` +
+                    `Đã upload ${data.length} công việc vào database.\n\n` +
+                    `Bạn có thể xem tại:\n` +
+                    `https://tranvananh152003-glitch.github.io/marketing-dashboard/dashboard-supabase-clean.html`,
+                    'success'
+                );
+
+                // Reset
+                document.getElementById('fileInput').value = '';
+                document.getElementById('fileName').style.display = 'none';
+                parsedData = [];
+
+            } catch (error) {
+                console.error('Upload error:', error);
+                
+                let errorMsg = '❌ LỖI UPLOAD!\n\n';
+                
+                if (error.message.includes('RLS')) {
+                    errorMsg += 'Lỗi: Row Level Security (RLS) đang chặn.\n\n';
+                    errorMsg += 'CÁCH FIX:\n';
+                    errorMsg += '1. Vào: https://supabase.com/dashboard/project/mtzkanuzjeaoejahwmmm/sql/new\n';
+                    errorMsg += '2. Chạy SQL: ALTER TABLE tasks DISABLE ROW LEVEL SECURITY;\n';
+                    errorMsg += '3. Thử lại';
+                } else if (error.message.includes('permission')) {
+                    errorMsg += 'Lỗi: Không có quyền insert vào database.\n\n';
+                    errorMsg += 'Cần tắt RLS trong Supabase settings.';
+                } else {
+                    errorMsg += 'Chi tiết lỗi:\n' + error.message;
+                }
+                
+                showResult(errorMsg, 'error');
+                document.getElementById('uploadBtn').disabled = false;
+            }
+        }
+
+        function showResult(text, type) {
+            const resultDiv = document.getElementById('result');
+            resultDiv.textContent = text;
+            resultDiv.className = type;
+            resultDiv.style.display = 'block';
+        }
+    </script>
+</body>
+</html>
