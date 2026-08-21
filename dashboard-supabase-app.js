@@ -280,6 +280,7 @@ const app = {
                 <div class="task-card ${task.status}">
                     <div class="task-actions">
                         <div class="task-action-btns">
+                            <button class="task-action-btn view" onclick="app.openViewModal(${task.id})">👁️ Xem</button>
                             <button class="task-action-btn edit" onclick="app.openEditModal(${task.id})">✏️ Sửa</button>
                             <button class="task-action-btn delete" onclick="app.deleteTask(${task.id})">🗑️ Xóa</button>
                         </div>
@@ -349,6 +350,91 @@ const app = {
         } catch (error) {
             console.error('Status update error:', error);
         }
+    },
+
+    // Open view modal
+    openViewModal(id) {
+        const task = this.tasks.find(t => t.id === id);
+        if (!task) return;
+        
+        const statusText = {
+            'completed': 'Hoàn thành',
+            'inprogress': 'Đang thực hiện',
+            'pending': 'Chưa bắt đầu',
+            'overdue': 'Quá hạn'
+        }[task.status];
+        
+        const modalContent = `
+            <div class="view-detail-grid">
+                <div class="view-detail-item">
+                    <span class="view-label">📁 Nhóm việc:</span>
+                    <span class="view-value">${task.group}</span>
+                </div>
+                <div class="view-detail-item">
+                    <span class="view-label">🎯 Chương trình:</span>
+                    <span class="view-value">${task.program}</span>
+                </div>
+                <div class="view-detail-item full-width">
+                    <span class="view-label">📝 Công việc:</span>
+                    <span class="view-value">${task.title}</span>
+                </div>
+                ${task.description ? `
+                <div class="view-detail-item full-width">
+                    <span class="view-label">📄 Mô tả:</span>
+                    <span class="view-value">${task.description}</span>
+                </div>
+                ` : ''}
+                <div class="view-detail-item">
+                    <span class="view-label">👥 Người điều phối:</span>
+                    <span class="view-value">${task.coordinator}</span>
+                </div>
+                <div class="view-detail-item">
+                    <span class="view-label">👤 Người thực hiện:</span>
+                    <span class="view-value">${task.assignee}</span>
+                </div>
+                <div class="view-detail-item">
+                    <span class="view-label">✅ Người duyệt:</span>
+                    <span class="view-value">${task.approver}</span>
+                </div>
+                <div class="view-detail-item">
+                    <span class="view-label">📅 Deadline:</span>
+                    <span class="view-value">${task.deadline}</span>
+                </div>
+                <div class="view-detail-item">
+                    <span class="view-label">🔁 Tần suất:</span>
+                    <span class="view-value">${task.frequency}</span>
+                </div>
+                <div class="view-detail-item">
+                    <span class="view-label">📊 Trạng thái:</span>
+                    <span class="view-value"><span class="status-badge ${task.status}">${statusText}</span></span>
+                </div>
+                <div class="view-detail-item full-width">
+                    <span class="view-label">📦 Đầu ra yêu cầu:</span>
+                    <span class="view-value">${task.required_output}</span>
+                </div>
+                <div class="view-detail-item">
+                    <span class="view-label">📈 Tiến độ:</span>
+                    <span class="view-value">${task.progress || 0}%</span>
+                </div>
+                ${task.submission_link || task.submission_note ? `
+                <div class="view-detail-item full-width submission-box">
+                    <span class="view-label">📤 Nộp bài:</span>
+                    <div class="submission-info">
+                        ${task.submission_link ? `<div>🔗 <a href="${task.submission_link}" target="_blank">${task.submission_link}</a></div>` : ''}
+                        ${task.submission_note ? `<div>📝 ${task.submission_note}</div>` : ''}
+                    </div>
+                </div>
+                ` : ''}
+            </div>
+        `;
+        
+        document.getElementById('viewModalContent').innerHTML = modalContent;
+        document.getElementById('viewModal').classList.add('active');
+    },
+
+    // Close view modal
+    closeViewModal() {
+        document.getElementById('viewModal').classList.remove('active');
     },
 
     // Open submit modal
@@ -605,6 +691,10 @@ function startApp() {
     
     document.getElementById('submitModal').addEventListener('click', (e) => {
         if (e.target.id === 'submitModal') app.closeSubmitModal();
+    });
+    
+    document.getElementById('viewModal').addEventListener('click', (e) => {
+        if (e.target.id === 'viewModal') app.closeViewModal();
     });
     
     // Realtime sync

@@ -191,6 +191,7 @@ header h1 { color: #333; font-size: 28px; margin-bottom: 10px; }
 }
 
 .task-action-btn.edit { background: #3b82f6; color: white; }
+.task-action-btn.view { background: #8b5cf6; color: white; }
 .task-action-btn.delete { background: #ef4444; color: white; }
 
 .task-status-badge {
@@ -363,4 +364,90 @@ header h1 { color: #333; font-size: 28px; margin-bottom: 10px; }
     header h1 { font-size: 22px; }
     .stats-grid { grid-template-columns: repeat(2, 1fr); }
     .form-grid { grid-template-columns: 1fr; }
+}
+
+/* View Detail Modal */
+.view-detail-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 20px;
+}
+
+.view-detail-item {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.view-detail-item.full-width {
+    grid-column: 1 / -1;
+}
+
+.view-label {
+    font-weight: 600;
+    color: #667eea;
+    font-size: 14px;
+}
+
+.view-value {
+    color: #333;
+    font-size: 15px;
+    line-height: 1.5;
+}
+
+.status-badge {
+    display: inline-block;
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.status-badge.completed {
+    background: #d1fae5;
+    color: #065f46;
+}
+
+.status-badge.inprogress {
+    background: #fef3c7;
+    color: #92400e;
+}
+
+.status-badge.pending {
+    background: #f3f4f6;
+    color: #374151;
+}
+
+.status-badge.overdue {
+    background: #fee2e2;
+    color: #991b1b;
+}
+
+.submission-box {
+    background: #f0fdf4;
+    padding: 15px;
+    border-radius: 8px;
+    border-left: 4px solid #10b981;
+}
+
+.submission-info {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.submission-info a {
+    color: #0891b2;
+    text-decoration: none;
+    word-break: break-all;
+}
+
+.submission-info a:hover {
+    text-decoration: underline;
+}
+
+@media (max-width: 768px) {
+    .view-detail-grid {
+        grid-template-columns: 1fr;
+    }
 }
