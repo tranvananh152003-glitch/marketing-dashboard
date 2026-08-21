@@ -707,8 +707,17 @@ function startApp() {
                 console.log('📤 Uploading files...');
                 
                 for (let file of files) {
-                    const fileName = `${Date.now()}_${file.name}`;
+                    // Sanitize filename: remove Vietnamese accents and special chars
+                    let sanitizedName = file.name
+                        .normalize('NFD')
+                        .replace(/[\u0300-\u036f]/g, '') // Remove diacritics
+                        .replace(/đ/g, 'd').replace(/Đ/g, 'D') // Replace đ
+                        .replace(/[^a-zA-Z0-9._-]/g, '_'); // Replace special chars with underscore
+                    
+                    const fileName = `${Date.now()}_${sanitizedName}`;
                     const filePath = `submissions/${fileName}`;
+                    
+                    console.log('Original:', file.name, '→ Sanitized:', fileName);
                     
                     const { data: uploadData, error: uploadError } = await supabaseClient
                         .storage
@@ -736,7 +745,7 @@ function startApp() {
                         .getPublicUrl(filePath);
                     
                     uploadedFileUrls.push({
-                        name: file.name,
+                        name: file.name, // Keep original name for display
                         url: urlData.publicUrl
                     });
                 }
