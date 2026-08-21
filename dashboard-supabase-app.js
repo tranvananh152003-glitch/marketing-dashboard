@@ -231,7 +231,8 @@ const app = {
     filterByGroup(group) {
         this.currentGroup = group;
         document.querySelectorAll('.group-tab').forEach(tab => {
-            tab.classList.toggle('active', tab.textContent.trim().startsWith(group));
+            const tabName = tab.textContent.split('\n')[0].trim();
+            tab.classList.toggle('active', tabName === group);
         });
         this.renderTasks(this.tasks.filter(t => t.group === group));
     },
@@ -240,7 +241,8 @@ const app = {
     filterByPerson(person) {
         this.currentPerson = person;
         document.querySelectorAll('.person-tab').forEach(tab => {
-            tab.classList.toggle('active', tab.textContent.trim().startsWith(person));
+            const tabName = tab.textContent.split('\n')[0].trim();
+            tab.classList.toggle('active', tabName === person);
         });
         this.renderTasks(this.tasks.filter(t => t.assignee === person));
     },
