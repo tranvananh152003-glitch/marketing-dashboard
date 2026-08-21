@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <title>Test Storage Upload</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        body { font-family: Arial; padding: 40px; max-width: 600px; margin: 0 auto; }
+        h1 { color: #333; }
+        .step { background: #f0f0f0; padding: 20px; margin: 20px 0; border-radius: 10px; }
+        button { padding: 12px 24px; background: #667eea; color: white; border: none; border-radius: 8px; cursor: pointer; font-size: 14px; margin: 10px 5px 0 0; }
+        button:hover { background: #5568d3; }
+        #result { margin-top: 20px; padding: 20px; border-radius: 8px; white-space: pre-wrap; }
+        .success { background: #d1fae5; color: #065f46; }
+        .error { background: #fee2e2; color: #991b1b; }
+        input[type="file"] { margin: 10px 0; }
+    </style>
+</head>
+<body>
+    <h1>🧪 Test Supabase Storage</h1>
+    
+    <div class="step">
+        <h3>Bước 1: Kiểm tra bucket có tồn tại không</h3>
+        <button onclick="checkBucket()">Kiểm tra bucket</button>
+    </div>
+    
+    <div class="step">
+        <h3>Bước 2: Upload file test</h3>
+        <input type="file" id="fileInput">
+        <br>
+        <button onclick="uploadFile()">Upload file</button>
+    </div>
+    
+    <div class="step">
+        <h3>Bước 3: Xem danh sách file</h3>
+        <button onclick="listFiles()">Xem file đã upload</button>
+    </div>
+    
+    <div id="result"></div>
+    
+    <script>
+        const supabase = window.supabase.createClient(
+            'https://mtzkanuzjeaoejahwmmm.supabase.co',
+            'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im10emthbnV6amVhb2VqYWh3bW1tIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODcwOTM1NjcsImV4cCI6MjEwMjY2OTU2N30.Darv0i4Tfabeqit_OERNxISrf9W-eqCYKABaFFitBBw'
+        );
+        
+        function showResult(text, type = 'success') {
+            const div = document.getElementById('result');
+            div.textContent = text;
+            div.className = type;
+        }
+        
+        async function checkBucket() {
+            try {
+                showResult('⏳ Đang kiểm tra bucket...', 'success');
+                
+                const { data, error } = await supabase.storage.listBuckets();
+                
+                if (error) throw error;
+                
+                const taskFilesBucket = data.find(b => b.name === 'task-files');
+                
+                if (taskFilesBucket) {
+                    showResult(
+                        '✅ BUCKET TỒN TẠI!\n\n' +
+                        'Bucket name: ' + taskFilesBucket.name + '\n' +
+                        'Public: ' + (taskFilesBucket.public ? 'Yes' : 'No') + '\n' +
+                        'Created: ' + new Date(taskFilesBucket.created_at).toLocaleString('vi-VN') + '\n\n' +
+                        'Bạn có thể upload file!',
+                        'success'
+                    );
+                } else {
+                    showResult(
+                        '❌ BUCKET CHƯA TỒN TẠI!\n\n' +
+                        'Cần tạo bucket "task-files" trong Supabase:\n' +
+                        '1. Vào: https://supabase.com/dashboard/project/mtzkanuzjeaoejahwmmm/storage/buckets\n' +
+                        '2. Bấm "New bucket"\n' +
+                        '3. Name: task-files\n' +
+                        '4. Public: YES\n' +
+                        '5. Create',
+                        'error'
+                    );
+                }
+            } catch (error) {
+                showResult('❌ LỖI: ' + error.message, 'error');
+            }
+        }
+        
+        async function uploadFile() {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                alert('Vui lòng chọn file!');
+                return;
+            }
+            
+            try {
+                showResult('⏳ Đang upload file: ' + file.name + '...', 'success');
+                
+                const fileName = Date.now() + '_' + file.name;
+                const filePath = 'test/' + fileName;
+                
+                const { data, error } = await supabase.storage
+                    .from('task-files')
+                    .upload(filePath, file, {
+                        cacheControl: '3600',
+                        upsert: false
+                    });
+                
+                if (error) throw error;
+                
+                // Get public URL
+                const { data: urlData } = supabase.storage
+                    .from('task-files')
+                    .getPublicUrl(filePath);
+                
+                showResult(
+                    '✅ UPLOAD THÀNH CÔNG!\n\n' +
+                    'File: ' + file.name + '\n' +
+                    'Size: ' + (file.size / 1024).toFixed(2) + ' KB\n' +
+                    'Path: ' + data.path + '\n\n' +
+                    'Link tải: ' + urlData.publicUrl + '\n\n' +
+                    'Thử mở link trên trong tab mới!',
+                    'success'
+                );
+                
+                fileInput.value = '';
+            } catch (error) {
+                showResult(
+                    '❌ UPLOAD THẤT BẠI!\n\n' +
+                    'Lỗi: ' + error.message + '\n\n' +
+                    (error.message.includes('not found') 
+                        ? 'Bucket chưa tồn tại! Chạy lại Bước 1.'
+                        : error.message.includes('policy')
+                        ? 'Chưa có quyền upload! Cần setup policy.'
+                        : 'Chi tiết: ' + JSON.stringify(error, null, 2)),
+                    'error'
+                );
+            }
+        }
+        
+        async function listFiles() {
+            try {
+                showResult('⏳ Đang tải danh sách file...', 'success');
+                
+                const { data, error } = await supabase.storage
+                    .from('task-files')
+                    .list('test', {
+                        limit: 100,
+                        offset: 0,
+                        sortBy: { column: 'created_at', order: 'desc' }
+                    });
+                
+                if (error) throw error;
+                
+                if (data.length === 0) {
+                    showResult('📭 Chưa có file nào.\n\nHãy upload file test ở Bước 2!', 'success');
+                } else {
+                    const fileList = data.map((f, i) => 
+                        `${i+1}. ${f.name} (${(f.metadata?.size / 1024).toFixed(2)} KB)`
+                    ).join('\n');
+                    
+                    showResult(
+                        `✅ CÓ ${data.length} FILE:\n\n${fileList}`,
+                        'success'
+                    );
+                }
+            } catch (error) {
+                showResult('❌ LỖI: ' + error.message, 'error');
+            }
+        }
+    </script>
+</body>
+</html>
