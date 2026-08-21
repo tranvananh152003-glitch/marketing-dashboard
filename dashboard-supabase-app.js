@@ -191,7 +191,9 @@ const app = {
         }
         
         container.innerHTML = groupNames.map((group, i) => `
-            <button class="group-tab ${i === 0 ? 'active' : ''}" onclick="app.filterByGroup('${group.replace(/'/g, "\\'")}')">
+            <button class="group-tab ${i === 0 ? 'active' : ''}" 
+                    data-group="${group.replace(/"/g, '&quot;')}" 
+                    onclick="app.filterByGroup('${group.replace(/'/g, "\\'")}')">
                 ${group}
                 <span class="tab-count">${groups[group]}</span>
             </button>
@@ -218,7 +220,9 @@ const app = {
         }
         
         container.innerHTML = personNames.map((person, i) => `
-            <button class="person-tab ${i === 0 ? 'active' : ''}" onclick="app.filterByPerson('${person.replace(/'/g, "\\'")}')">
+            <button class="person-tab ${i === 0 ? 'active' : ''}" 
+                    data-person="${person.replace(/"/g, '&quot;')}" 
+                    onclick="app.filterByPerson('${person.replace(/'/g, "\\'")}')">
                 ${person}
                 <span class="tab-count">${people[person]}</span>
             </button>
@@ -231,8 +235,7 @@ const app = {
     filterByGroup(group) {
         this.currentGroup = group;
         document.querySelectorAll('.group-tab').forEach(tab => {
-            const tabName = tab.textContent.split('\n')[0].trim();
-            tab.classList.toggle('active', tabName === group);
+            tab.classList.toggle('active', tab.dataset.group === group);
         });
         this.renderTasks(this.tasks.filter(t => t.group === group));
     },
@@ -241,8 +244,7 @@ const app = {
     filterByPerson(person) {
         this.currentPerson = person;
         document.querySelectorAll('.person-tab').forEach(tab => {
-            const tabName = tab.textContent.split('\n')[0].trim();
-            tab.classList.toggle('active', tabName === person);
+            tab.classList.toggle('active', tab.dataset.person === person);
         });
         this.renderTasks(this.tasks.filter(t => t.assignee === person));
     },
