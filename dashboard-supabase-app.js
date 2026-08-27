@@ -44,6 +44,7 @@ const app = {
     currentGroup: null,
     currentPerson: null,
     currentStatus: null,
+    currentProgram: null,
     editingId: null,
     selectedFiles: [], // Store selected files for upload
 
@@ -123,6 +124,7 @@ const app = {
         this.currentGroup = null;
         this.currentPerson = null;
         this.currentStatus = null;
+        this.currentProgram = null;
         
         // Update active tab
         document.querySelectorAll('.view-tab').forEach(tab => tab.classList.remove('active'));
@@ -131,11 +133,14 @@ const app = {
         // Remove active status from stat cards
         document.querySelectorAll('.stat-card').forEach(card => card.classList.remove('active-filter'));
         
+        document.getElementById('programTabs').style.display = 'none';
         document.getElementById('groupTabs').style.display = 'none';
         document.getElementById('personTabs').style.display = 'none';
         
         if (view === 'all') {
             this.renderTasks(this.tasks);
+        } else if (view === 'program') {
+            this.renderProgramTabs();
         } else if (view === 'group') {
             this.renderGroupTabs();
         } else if (view === 'people') {
@@ -170,6 +175,91 @@ const app = {
         
         // Filter and render
         const filtered = this.tasks.filter(t => t.status === status);
+        this.renderTasks(filtered);
+    },
+
+    // Render program tabs
+    renderProgramTabs() {
+        const programs = {};
+        this.tasks.forEach(task => {
+            programs[task.program] = (programs[task.program] || 0) + 1;
+        });
+        
+        const programNames = Object.keys(programs).sort();
+        const container = document.getElementById('programTabs');
+        container.style.display = 'flex';
+        
+        if (programNames.length === 0) {
+            container.innerHTML = '<div style="padding:20px;color:#666;">Chưa có chương trình</div>';
+            this.renderTasks([]);
+            return;
+        }
+        
+        container.innerHTML = programNames.map((program, i) => `
+            <button class="program-tab ${i === 0 ? 'active' : ''}" 
+                    data-program="${program.replace(/"/g, '&quot;')}" 
+                    onclick="app.filterByProgram('${program.replace(/'/g, "\\'")}')">
+                ${program}
+                <span class="tab-count">${programs[program]}</span>
+            </button>
+        `).join('');
+        
+        this.filterByProgram(programNames[0]);
+    },
+
+    // Filter by program (then show group tabs for that program)
+    filterByProgram(program) {
+        this.currentProgram = program;
+        
+        // Update active program tab
+        document.querySelectorAll('.program-tab').forEach(tab => {
+            tab.classList.toggle('active', tab.dataset.program === program);
+        });
+        
+        // Get tasks for this program
+        const programTasks = this.tasks.filter(t => t.program === program);
+        
+        // Show group tabs for this program
+        const groups = {};
+        programTasks.forEach(task => {
+            groups[task.group] = (groups[task.group] || 0) + 1;
+        });
+        
+        const groupNames = Object.keys(groups).sort();
+        const groupContainer = document.getElementById('groupTabs');
+        
+        if (groupNames.length === 0) {
+            groupContainer.style.display = 'none';
+            this.renderTasks(programTasks);
+            return;
+        }
+        
+        groupContainer.style.display = 'flex';
+        groupContainer.innerHTML = groupNames.map((group, i) => `
+            <button class="group-tab ${i === 0 ? 'active' : ''}" 
+                    data-group="${group.replace(/"/g, '&quot;')}" 
+                    onclick="app.filterByProgramAndGroup('${program.replace(/'/g, "\\'")}', '${group.replace(/'/g, "\\'")}')">
+                ${group}
+                <span class="tab-count">${groups[group]}</span>
+            </button>
+        `).join('');
+        
+        // Auto-select first group
+        this.filterByProgramAndGroup(program, groupNames[0]);
+    },
+
+    // Filter by program and group
+    filterByProgramAndGroup(program, group) {
+        this.currentProgram = program;
+        this.currentGroup = group;
+        
+        // Update active group tab
+        document.querySelectorAll('.group-tab').forEach(tab => {
+            tab.classList.toggle('active', tab.dataset.group === group);
+        });
+        
+        // Show tasks for this program and group
+        const filtered = this.tasks.filter(t => t.program === program && t.group === group);
         this.renderTasks(filtered);
     },
 
@@ -255,6 +345,12 @@ const app = {
             this.renderTasks(this.tasks);
         } else if (this.currentView === 'status' && this.currentStatus) {
             this.renderTasks(this.tasks.filter(t => t.status === this.currentStatus));
+        } else if (this.currentView === 'program' && this.currentProgram) {
+            if (this.currentGroup) {
+                this.renderTasks(this.tasks.filter(t => t.program === this.currentProgram && t.group === this.currentGroup));
+            } else {
+                this.renderTasks(this.tasks.filter(t => t.program === this.currentProgram));
+            }
         } else if (this.currentView === 'group' && this.currentGroup) {
             this.renderTasks(this.tasks.filter(t => t.group === this.currentGroup));
         } else if (this.currentView === 'people' && this.currentPerson) {

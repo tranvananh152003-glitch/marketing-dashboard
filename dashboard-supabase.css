@@ -102,7 +102,7 @@ header h1 { color: #333; font-size: 28px; margin-bottom: 10px; }
 .view-tab:hover { background: rgba(255,255,255,0.3); }
 .view-tab.active { background: white; color: #667eea; }
 
-.group-tabs, .person-tabs {
+.group-tabs, .person-tabs, .program-tabs {
     display: flex;
     gap: 10px;
     flex-wrap: wrap;
@@ -113,7 +113,7 @@ header h1 { color: #333; font-size: 28px; margin-bottom: 10px; }
     margin-bottom: 20px;
 }
 
-.group-tab, .person-tab {
+.group-tab, .person-tab, .program-tab {
     padding: 12px 20px;
     border: 2px solid #e5e7eb;
     border-radius: 10px;
@@ -128,13 +128,13 @@ header h1 { color: #333; font-size: 28px; margin-bottom: 10px; }
     gap: 8px;
 }
 
-.group-tab:hover, .person-tab:hover {
+.group-tab:hover, .person-tab:hover, .program-tab:hover {
     border-color: #667eea;
     transform: translateY(-2px);
     box-shadow: 0 4px 12px rgba(102, 126, 234, 0.2);
 }
 
-.group-tab.active, .person-tab.active {
+.group-tab.active, .person-tab.active, .program-tab.active {
     background: #667eea;
     color: white;
     border-color: #667eea;

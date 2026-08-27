@@ -47,10 +47,12 @@
 
         <div class="view-tabs">
             <button class="view-tab active" onclick="app.switchView('all')">📋 Tất cả</button>
+            <button class="view-tab" onclick="app.switchView('program')">🎯 Theo chương trình</button>
             <button class="view-tab" onclick="app.switchView('group')">📁 Theo nhóm việc</button>
             <button class="view-tab" onclick="app.switchView('people')">👥 Theo người</button>
         </div>
 
+        <div id="programTabs" class="program-tabs" style="display:none;"></div>
         <div id="groupTabs" class="group-tabs" style="display:none;"></div>
         <div id="personTabs" class="person-tabs" style="display:none;"></div>
 
