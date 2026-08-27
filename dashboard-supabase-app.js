@@ -47,6 +47,8 @@ const app = {
     currentProgram: null,
     editingId: null,
     selectedFiles: [], // Store selected files for upload
+    searchKeyword: '', // Search keyword
+    filteredTasks: [], // Filtered tasks based on search
 
     // Load tasks from Supabase
     async loadTasks() {
@@ -148,7 +150,67 @@ const app = {
         }
     },
 
-    // Filter by status
+    // Filter tasks by keyword
+    filterTasks(keyword) {
+        this.searchKeyword = keyword.toLowerCase().trim();
+        
+        // Show/hide clear button
+        const clearBtn = document.getElementById('clearFilterBtn');
+        clearBtn.style.display = keyword ? 'block' : 'none';
+        
+        // Re-render current view with filter
+        this.renderView();
+    },
+
+    // Clear filter
+    clearFilter() {
+        this.searchKeyword = '';
+        document.getElementById('searchInput').value = '';
+        document.getElementById('clearFilterBtn').style.display = 'none';
+        this.renderView();
+    },
+
+    // Get tasks for current view (with search filter)
+    getTasksForCurrentView() {
+        let tasks = [];
+        
+        // Get tasks based on current view
+        if (this.currentView === 'all') {
+            tasks = this.tasks;
+        } else if (this.currentView === 'status' && this.currentStatus) {
+            tasks = this.tasks.filter(t => t.status === this.currentStatus);
+        } else if (this.currentView === 'program' && this.currentProgram) {
+            if (this.currentGroup) {
+                tasks = this.tasks.filter(t => t.program === this.currentProgram && t.group === this.currentGroup);
+            } else {
+                tasks = this.tasks.filter(t => t.program === this.currentProgram);
+            }
+        } else if (this.currentView === 'group' && this.currentGroup) {
+            tasks = this.tasks.filter(t => t.group === this.currentGroup);
+        } else if (this.currentView === 'people' && this.currentPerson) {
+            tasks = this.tasks.filter(t => t.assignee === this.currentPerson);
+        }
+        
+        // Apply search filter if exists
+        if (this.searchKeyword) {
+            tasks = tasks.filter(task => {
+                const searchableText = [
+                    task.title,
+                    task.description,
+                    task.group,
+                    task.program,
+                    task.assignee,
+                    task.coordinator,
+                    task.approver,
+                    task.required_output
+                ].join(' ').toLowerCase();
+                
+                return searchableText.includes(this.searchKeyword);
+            });
+        }
+        
+        return tasks;
+    },
     filterByStatus(status) {
         this.currentStatus = status;
         this.currentView = 'status';
@@ -341,21 +403,8 @@ const app = {
 
     // Render view
     renderView() {
-        if (this.currentView === 'all') {
-            this.renderTasks(this.tasks);
-        } else if (this.currentView === 'status' && this.currentStatus) {
-            this.renderTasks(this.tasks.filter(t => t.status === this.currentStatus));
-        } else if (this.currentView === 'program' && this.currentProgram) {
-            if (this.currentGroup) {
-                this.renderTasks(this.tasks.filter(t => t.program === this.currentProgram && t.group === this.currentGroup));
-            } else {
-                this.renderTasks(this.tasks.filter(t => t.program === this.currentProgram));
-            }
-        } else if (this.currentView === 'group' && this.currentGroup) {
-            this.renderTasks(this.tasks.filter(t => t.group === this.currentGroup));
-        } else if (this.currentView === 'people' && this.currentPerson) {
-            this.renderTasks(this.tasks.filter(t => t.assignee === this.currentPerson));
-        }
+        const tasks = this.getTasksForCurrentView();
+        this.renderTasks(tasks);
     },
 
     // Render tasks

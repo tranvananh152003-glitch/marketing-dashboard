@@ -52,6 +52,17 @@
             <button class="view-tab" onclick="app.switchView('people')">👥 Theo người</button>
         </div>
 
+        <div class="filter-bar">
+            <input type="text" 
+                   id="searchInput" 
+                   class="search-input" 
+                   placeholder="🔍 Tìm kiếm công việc..." 
+                   oninput="app.filterTasks(this.value)">
+            <button class="clear-filter-btn" onclick="app.clearFilter()" style="display:none;" id="clearFilterBtn">
+                ✕ Xóa lọc
+            </button>
+        </div>
+
         <div id="programTabs" class="program-tabs" style="display:none;"></div>
         <div id="groupTabs" class="group-tabs" style="display:none;"></div>
         <div id="personTabs" class="person-tabs" style="display:none;"></div>
