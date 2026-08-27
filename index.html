@@ -56,8 +56,17 @@
             <input type="text" 
                    id="searchInput" 
                    class="search-input" 
-                   placeholder="🔍 Tìm kiếm công việc..." 
-                   oninput="app.filterTasks(this.value)">
+                   placeholder="🔍 Tìm kiếm công việc (tên, mô tả, người thực hiện...)" 
+                   oninput="app.filterTasks()">
+            
+            <select id="statusFilter" class="status-filter" onchange="app.filterTasks()">
+                <option value="">📊 Tất cả trạng thái</option>
+                <option value="pending">📋 Chưa bắt đầu</option>
+                <option value="inprogress">⏳ Đang thực hiện</option>
+                <option value="completed">✅ Hoàn thành</option>
+                <option value="overdue">⚠️ Quá hạn</option>
+            </select>
+            
             <button class="clear-filter-btn" onclick="app.clearFilter()" style="display:none;" id="clearFilterBtn">
                 ✕ Xóa lọc
             </button>

@@ -48,7 +48,7 @@ const app = {
     editingId: null,
     selectedFiles: [], // Store selected files for upload
     searchKeyword: '', // Search keyword
-    filteredTasks: [], // Filtered tasks based on search
+    filterStatus: '', // Filter by status
 
     // Load tasks from Supabase
     async loadTasks() {
@@ -150,13 +150,17 @@ const app = {
         }
     },
 
-    // Filter tasks by keyword
-    filterTasks(keyword) {
+    // Filter tasks by keyword and status
+    filterTasks() {
+        const keyword = document.getElementById('searchInput').value;
+        const status = document.getElementById('statusFilter').value;
+        
         this.searchKeyword = keyword.toLowerCase().trim();
+        this.filterStatus = status;
         
         // Show/hide clear button
         const clearBtn = document.getElementById('clearFilterBtn');
-        clearBtn.style.display = keyword ? 'block' : 'none';
+        clearBtn.style.display = (keyword || status) ? 'block' : 'none';
         
         // Re-render current view with filter
         this.renderView();
@@ -165,7 +169,9 @@ const app = {
     // Clear filter
     clearFilter() {
         this.searchKeyword = '';
+        this.filterStatus = '';
         document.getElementById('searchInput').value = '';
+        document.getElementById('statusFilter').value = '';
         document.getElementById('clearFilterBtn').style.display = 'none';
         this.renderView();
     },
@@ -207,6 +213,11 @@ const app = {
                 
                 return searchableText.includes(this.searchKeyword);
             });
+        }
+        
+        // Apply status filter if exists
+        if (this.filterStatus) {
+            tasks = tasks.filter(task => task.status === this.filterStatus);
         }
         
         return tasks;
